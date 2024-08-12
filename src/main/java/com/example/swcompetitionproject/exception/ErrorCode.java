@@ -7,6 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ErrorCode {
 
+    //BadRequestException
+
     //UnauthorizedException
     INVALID_TOKEN("4010","유효하지 않은 토큰입니다."),
 
