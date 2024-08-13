@@ -17,6 +17,7 @@ public enum ErrorCode {
     //NotFoundException
     COOKIE_NOT_FOUND("4040","쿠키를 찾을 수 없습니다."),
     USER_NOT_FOUND("4041","유저를 찾을 수 없습니다."),
+    ROOM_NOT_FOUND("4042","방을 찾을 수 없습니다."),
 
     //ConflictException
 
