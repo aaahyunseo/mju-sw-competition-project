@@ -1,16 +1,14 @@
 package com.example.swcompetitionproject.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-
-import java.util.UUID;
+import lombok.*;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Getter
+@Setter
 @Table(name = "messages")
 public class Message extends BaseEntity {
     //메세지 내용
@@ -19,7 +17,7 @@ public class Message extends BaseEntity {
 
     //발신자
     @Column(nullable = false)
-    private UUID sender;
+    private String sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chattingRoom_id")
