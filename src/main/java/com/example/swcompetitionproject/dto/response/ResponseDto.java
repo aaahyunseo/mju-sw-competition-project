@@ -1,4 +1,4 @@
-package com.example.swcompetitionproject.dto.response.response;
+package com.example.swcompetitionproject.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
