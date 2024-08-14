@@ -1,4 +1,4 @@
-package com.example.swcompetitionproject.dto.response.request;
+package com.example.swcompetitionproject.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
