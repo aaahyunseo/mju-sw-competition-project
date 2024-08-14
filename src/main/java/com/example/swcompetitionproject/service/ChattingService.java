@@ -1,6 +1,6 @@
 package com.example.swcompetitionproject.service;
 
-import com.example.swcompetitionproject.dto.request.chatting.ChatRequestDto;
+import com.example.swcompetitionproject.dto.request.chatting.ChatMessageDto;
 import com.example.swcompetitionproject.dto.request.chatting.CreateRoomDto;
 import com.example.swcompetitionproject.dto.response.chatting.ChattingRoomListData;
 import com.example.swcompetitionproject.entity.*;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,9 +36,9 @@ public class ChattingService {
 
     //채팅방 생성하기 - 게시글 생성 시 채팅방 생성
     @Transactional
-    public ChattingRoom createRoom(User user, CreateRoomDto createRoomDto) {
+    public ChattingRoom createRoom(User user, String roomTitle) {
         ChattingRoom room = ChattingRoom.builder()
-                .title(createRoomDto.getTitle())
+                .title(roomTitle)
                 .manager(user.getName())
                 .memberCount(1)
                 .build();
@@ -53,8 +54,8 @@ public class ChattingService {
 
     //채팅 메시지 저장
     @Transactional
-    public Message saveMessage(User user, ChatRequestDto message) {
-        ChattingRoom room = chattingRoomRepository.findById(message.getRoomId())
+    public Message saveMessage(User user, UUID roomId, ChatMessageDto message) {
+        ChattingRoom room = chattingRoomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
 
         Message newMessage = Message.builder()
@@ -68,8 +69,8 @@ public class ChattingService {
 
     //사용자를 채팅방에 추가
     @Transactional
-    public void addUserToRoom(User user, ChatRequestDto message) {
-        ChattingRoom room = chattingRoomRepository.findById(message.getRoomId())
+    public void addUserToRoom(User user, UUID roomId) {
+        ChattingRoom room = chattingRoomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
 
         RoomMember member = RoomMember.builder()
@@ -84,8 +85,8 @@ public class ChattingService {
 
     // 채팅방 퇴장하기
     @Transactional
-    public void removeUserFromRoom(User user, ChatRequestDto message) {
-        ChattingRoom room = chattingRoomRepository.findById(message.getRoomId())
+    public void removeUserFromRoom(User user, UUID roomId) {
+        ChattingRoom room = chattingRoomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
 
         RoomMember member = roomMemberRepository.findByNameAndChattingRoom(user.getName(), room)
