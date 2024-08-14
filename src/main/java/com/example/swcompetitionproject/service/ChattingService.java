@@ -1,7 +1,6 @@
 package com.example.swcompetitionproject.service;
 
 import com.example.swcompetitionproject.dto.request.chatting.ChatMessageDto;
-import com.example.swcompetitionproject.dto.request.chatting.CreateRoomDto;
 import com.example.swcompetitionproject.dto.response.chatting.ChattingRoomListData;
 import com.example.swcompetitionproject.entity.*;
 import com.example.swcompetitionproject.exception.ErrorCode;
@@ -36,9 +35,9 @@ public class ChattingService {
 
     //채팅방 생성하기 - 게시글 생성 시 채팅방 생성
     @Transactional
-    public ChattingRoom createRoom(User user, String roomTitle) {
+    public ChattingRoom createRoom(User user, Board board) {
         ChattingRoom room = ChattingRoom.builder()
-                .title(roomTitle)
+                .title(board.getTitle())
                 .manager(user.getName())
                 .memberCount(1)
                 .build();
