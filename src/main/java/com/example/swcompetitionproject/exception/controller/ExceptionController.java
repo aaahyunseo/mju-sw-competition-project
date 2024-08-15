@@ -75,11 +75,11 @@ public class ExceptionController {
         }
         ErrorCode errorCode = ErrorCode.resolveValidationErrorCode(fieldError.getCode());
         String detail = fieldError.getDefaultMessage();
-        DtoValidationException dtoValidationException = new DtoValidationException(errorCode, detail);
+        ValidationException validationException = new ValidationException(errorCode, detail);
 
-        this.writeLog(dtoValidationException);
+        this.writeLog(validationException);
 
-        return new ResponseEntity<>(res(dtoValidationException), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(res(validationException), HttpStatus.BAD_REQUEST);
     }
 
 
