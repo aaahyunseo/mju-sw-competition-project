@@ -3,6 +3,7 @@ package com.example.swcompetitionproject.controller;
 import com.example.swcompetitionproject.authentication.AuthenticatedUser;
 import com.example.swcompetitionproject.dto.request.user.ModifyUserNameDto;
 import com.example.swcompetitionproject.dto.response.ResponseDto;
+import com.example.swcompetitionproject.dto.response.board.MyBoardListData;
 import com.example.swcompetitionproject.dto.response.user.UserResponseDto;
 import com.example.swcompetitionproject.entity.User;
 import com.example.swcompetitionproject.service.MyPageService;
@@ -36,4 +37,12 @@ public class MypageController {
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK,"유저 정보 조회 완료",userResponseDto),HttpStatus.OK);
     }
 
+    /**
+     * 나의 게시판 조회
+     */
+    @GetMapping("/board")
+    public ResponseEntity<ResponseDto<MyBoardListData>> getUserBoard(@AuthenticatedUser User user){
+        MyBoardListData myBoards=myPageService.getUserBoard(user);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK,"나의 게시판 조회 완료",myBoards),HttpStatus.OK);
+    }
 }
