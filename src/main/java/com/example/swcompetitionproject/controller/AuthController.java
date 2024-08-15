@@ -2,7 +2,7 @@ package com.example.swcompetitionproject.controller;
 
 import com.example.swcompetitionproject.authentication.AuthenticationExtractor;
 import com.example.swcompetitionproject.authentication.JwtEncoder;
-import com.example.swcompetitionproject.dto.request.LoginDto;
+import com.example.swcompetitionproject.dto.request.auth.LoginDto;
 import com.example.swcompetitionproject.dto.response.ResponseDto;
 import com.example.swcompetitionproject.dto.response.TokenResponseDto;
 import com.example.swcompetitionproject.service.LoginService;
