@@ -3,6 +3,7 @@ package com.example.swcompetitionproject.controller;
 import com.example.swcompetitionproject.authentication.AuthenticationExtractor;
 import com.example.swcompetitionproject.authentication.JwtEncoder;
 import com.example.swcompetitionproject.dto.request.auth.LoginDto;
+import com.example.swcompetitionproject.dto.response.LoginResponseDto;
 import com.example.swcompetitionproject.dto.response.ResponseDto;
 import com.example.swcompetitionproject.dto.response.TokenResponseDto;
 import com.example.swcompetitionproject.service.LoginService;
@@ -26,7 +27,7 @@ public class AuthController {
     private final LoginService loginService;
 
     @PostMapping("/login")
-    public ResponseEntity<ResponseDto<Void>> login(@RequestBody @Valid LoginDto loginDto, HttpServletResponse response) {
+    public ResponseEntity<LoginResponseDto<Void>> login(@RequestBody @Valid LoginDto loginDto, HttpServletResponse response) {
         try {
             TokenResponseDto tokenResponseDto=loginService.login(loginDto);
             String bearerToken = JwtEncoder.encode(tokenResponseDto.getAccessToken());
@@ -39,10 +40,10 @@ public class AuthController {
                     .build();
             response.addHeader("set-cookie", cookie.toString());
 
-            return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "학교 계정으로 로그인 완료"), HttpStatus.CREATED);
+            return new ResponseEntity<>(LoginResponseDto.loginres(HttpStatus.CREATED, "학교 계정으로 로그인 완료",bearerToken), HttpStatus.CREATED);
         } catch (Exception e) {
 
-            return new ResponseEntity<>(ResponseDto.res(HttpStatus.UNAUTHORIZED, "학교 계정으로 로그인 실패"), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(LoginResponseDto.loginres(HttpStatus.UNAUTHORIZED, "학교 계정으로 로그인 실패",null), HttpStatus.UNAUTHORIZED);
         }
     }
 
