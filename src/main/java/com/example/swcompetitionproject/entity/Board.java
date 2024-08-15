@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,19 +17,18 @@ public class Board extends BaseEntity {
     @Column(nullable = false)
     private String title;
 
-    //카테고리
-    @ElementCollection
-    @CollectionTable(name = "board_categories", joinColumns = @JoinColumn(name = "board_id"))
-    @Column(name = "category", nullable = false)
-    private List<String> category;
-
     //게시글 본문
     @Column(nullable = false)
     private String content;
 
     //기숙사 건물 이름
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private DormitoryType dormitory;
+
+    //n인실
+    @Column(nullable = false)
+    private int total;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -45,8 +42,8 @@ public class Board extends BaseEntity {
         this.content = content;
         return this;
     }
-
-    public void setChattingRoom(ChattingRoom chattingRoom){
-        this.chattingRoom = chattingRoom;
+    public Board setTotal(int total){
+        this.total = total;
+        return this;
     }
 }
