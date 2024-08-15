@@ -32,7 +32,7 @@ public class ChatMessageController {
         chattingService.addUserToRoom(user, roomId);
 
         // 입장 메시지 생성 및 전송
-        message.setContent(user.getName() + "님이 입장하셨습니다.");
+        message.setContent(user.getStudentNumber() + "님이 입장하셨습니다.");
         template.convertAndSend("/sub/ws/chat/room/" + roomId, message);
     }
 
@@ -53,7 +53,7 @@ public class ChatMessageController {
         chattingService.removeUserFromRoom(user, roomId);
 
         // 퇴장 메시지 생성 및 전송
-        message.setContent(user.getName() + "님이 퇴장하셨습니다.");
+        message.setContent(user.getStudentNumber() + "님이 퇴장하셨습니다.");
         template.convertAndSend("/sub/ws/chat/room/" + roomId, message);
     }
 }
