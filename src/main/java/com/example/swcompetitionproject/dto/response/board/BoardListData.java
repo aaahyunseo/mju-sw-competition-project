@@ -1,4 +1,4 @@
-package com.example.swcompetitionproject.dto.response;
+package com.example.swcompetitionproject.dto.response.board;
 
 import com.example.swcompetitionproject.entity.Board;
 import lombok.Builder;
@@ -10,13 +10,13 @@ import java.util.stream.Collectors;
 @Getter
 @Builder
 public class BoardListData {
-    private List<BoardDto> boardDtoList;
+    private List<BoardResponseDto> boardDtoList;
 
     public static BoardListData from(List<Board> boards) {
         return BoardListData.builder()
                 .boardDtoList(
                         boards.stream()
-                                .map(BoardDto::from)
+                                .map(BoardResponseDto::from)
                                 .collect(Collectors.toList()))
                 .build();
     }
