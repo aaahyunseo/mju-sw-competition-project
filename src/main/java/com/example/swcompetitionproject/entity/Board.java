@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @Table(name = "boards")
 public class Board extends BaseEntity {
-    //제목
+    //게시글 제목
     @Column(nullable = false)
     private String title;
 
@@ -25,13 +25,13 @@ public class Board extends BaseEntity {
     @Column(name = "category", nullable = false)
     private List<String> category;
 
-    //본문
+    //게시글 본문
     @Column(nullable = false)
     private String content;
 
     //기숙사 건물 이름
     @Column(nullable = false)
-    private String dormitory;
+    private DormitoryType dormitory;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -45,8 +45,8 @@ public class Board extends BaseEntity {
         this.content = content;
         return this;
     }
-    public Board setCategory(List<String> category){
-        this.category = category;
-        return this;
+
+    public void setChattingRoom(ChattingRoom chattingRoom){
+        this.chattingRoom = chattingRoom;
     }
 }
