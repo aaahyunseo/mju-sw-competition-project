@@ -21,7 +21,6 @@ public class User extends BaseEntity{
     private String name;
 
     //전공(소속)
-    @Column(nullable = false)
     private String major;
 
     //학번
