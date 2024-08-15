@@ -45,7 +45,7 @@ public class BoardService {
     /**
      * 게시글 작성
      * **/
-    public void createBoard(String dormitory, CreateBoardDto createBoardDto, User user){
+    public void createBoard(String dormitory, CreateBoardDto createBoardDto, User user) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
 
         switch (dormitoryType) {
@@ -57,6 +57,7 @@ public class BoardService {
                 createBoardDto.setTotal(4);
                 break;
             default:
+                if (createBoardDto.getTotal() == 0) throw new UnauthorizedException(ErrorCode.NOT_BLANK);
                 break;
         }
 
@@ -76,7 +77,7 @@ public class BoardService {
     /**
      * 게시글 수정
      * **/
-    public void updateBoard(String dormitory, UUID boardId, UpdateBoardDto updateBoardDto, User user){
+    public void updateBoard(String dormitory, UUID boardId, UpdateBoardDto updateBoardDto, User user) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
         Board updateBoard = boardValidate(dormitoryType, boardId, user);
 
@@ -91,6 +92,7 @@ public class BoardService {
                 updateBoard.setTotal(4);
                 break;
             default:
+                if (updateBoard.getTotal() == 0) throw new UnauthorizedException(ErrorCode.NOT_BLANK);
                 updateBoard.setTotal(updateBoard.getTotal());
                 break;
         }
