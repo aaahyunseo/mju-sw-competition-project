@@ -11,6 +11,7 @@ public enum ErrorCode {
 
     //UnauthorizedException
     INVALID_TOKEN("4010","유효하지 않은 토큰입니다."),
+    INVALID_DORMITORY("4042","유효하지 않은 기숙사입니다."),
 
     //ForbiddenException
 
