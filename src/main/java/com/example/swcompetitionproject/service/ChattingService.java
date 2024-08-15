@@ -38,8 +38,9 @@ public class ChattingService {
     public ChattingRoom createRoom(User user, Board board) {
         ChattingRoom room = ChattingRoom.builder()
                 .title(board.getTitle())
-                .manager(user.getName())
+                .manager(user.getStudentNumber())
                 .memberCount(1)
+                .board(board)
                 .build();
 
         UserRoom userRoom = UserRoom.builder()
@@ -59,7 +60,7 @@ public class ChattingService {
 
         Message newMessage = Message.builder()
                 .content(message.getContent())
-                .sender(user.getName())
+                .sender(user.getStudentNumber())
                 .chattingRoom(room)
                 .build();
 
@@ -73,7 +74,7 @@ public class ChattingService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
 
         RoomMember member = RoomMember.builder()
-                .name(user.getName())
+                .name(user.getStudentNumber())
                 .chattingRoom(room)
                 .build();
         roomMemberRepository.save(member);
@@ -88,13 +89,18 @@ public class ChattingService {
         ChattingRoom room = chattingRoomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
 
-        RoomMember member = roomMemberRepository.findByNameAndChattingRoom(user.getName(), room)
+        RoomMember member = roomMemberRepository.findByNameAndChattingRoom(user.getStudentNumber(), room)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
         roomMemberRepository.delete(member);
 
         room.setMemberCount(room.getMemberCount() - 1);
         chattingRoomRepository.save(room);
+    }
+
+    // 채팅방 삭제하기
+    public void deleteRoom(Board board){
+        chattingRoomRepository.deleteByBoard(board);
     }
 }
 
