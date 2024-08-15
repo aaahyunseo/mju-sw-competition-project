@@ -1,4 +1,4 @@
-package com.example.swcompetitionproject.dto.request;
+package com.example.swcompetitionproject.dto.request.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
