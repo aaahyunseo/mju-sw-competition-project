@@ -48,11 +48,22 @@ public class BoardService {
     public void createBoard(String dormitory, CreateBoardDto createBoardDto, User user){
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
 
+        switch (dormitoryType) {
+            case DORMITORY4:
+                createBoardDto.setTotal(2);
+                break;
+            case DORMITORY5:
+            case MYOUNGDEOK:
+                createBoardDto.setTotal(4);
+                break;
+        }
+
         Board newBoard = Board.builder()
                 .user(user)
                 .title(createBoardDto.getTitle())
                 .content(createBoardDto.getContent())
                 .dormitory(dormitoryType)
+                .total(createBoardDto.getTotal())
                 .build();
 
         //게시글 작성 완료와 동시에 채팅방 생성
@@ -68,6 +79,20 @@ public class BoardService {
         Board updateBoard = boardValidate(dormitoryType, boardId, user);
 
         updateBoard.setContent(updateBoardDto.getContent());
+
+        switch (dormitoryType) {
+            case DORMITORY4:
+                updateBoard.setTotal(2);
+                break;
+            case DORMITORY5:
+            case MYOUNGDEOK:
+                updateBoard.setTotal(4);
+                break;
+            default:
+                updateBoard.setTotal(updateBoard.getTotal());
+                break;
+        }
+
         boardRepository.save(updateBoard);
     }
 
