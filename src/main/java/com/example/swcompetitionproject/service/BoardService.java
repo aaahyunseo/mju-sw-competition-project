@@ -28,7 +28,7 @@ public class BoardService {
      * **/
     public BoardListData getBoardList(String dormitory){
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
-        List<Board> boards = boardRepository.findAllByDormitory(dormitoryType);
+        List<Board> boards = boardRepository.findAllByDormitoryOrderByCreatedAtDesc(dormitoryType);
         return BoardListData.from(boards);
     }
 
@@ -55,6 +55,8 @@ public class BoardService {
             case DORMITORY5:
             case MYOUNGDEOK:
                 createBoardDto.setTotal(4);
+                break;
+            default:
                 break;
         }
 
