@@ -6,9 +6,13 @@ import com.example.swcompetitionproject.exception.dto.ErrorResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import static com.example.swcompetitionproject.exception.dto.ErrorResponseDto.res;
 
 @Slf4j
 @RestControllerAdvice
@@ -21,7 +25,7 @@ public class ExceptionController {
             ConflictException duplicationException) {
 
         this.writeLog(duplicationException);
-        return new ResponseEntity<>(ErrorResponseDto.res(duplicationException), HttpStatus.CONFLICT);
+        return new ResponseEntity<>(res(duplicationException), HttpStatus.CONFLICT);
     }
 
     //ForbiddenException 핸들러
@@ -31,7 +35,7 @@ public class ExceptionController {
             ForbiddenException forbiddenException) {
 
         this.writeLog(forbiddenException);
-        return new ResponseEntity<>(ErrorResponseDto.res(forbiddenException), HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(res(forbiddenException), HttpStatus.FORBIDDEN);
     }
 
     //NotFoundException(소스 없음) 핸들러
@@ -41,7 +45,7 @@ public class ExceptionController {
             NotFoundException notFoundException) {
 
         this.writeLog(notFoundException);
-        return new ResponseEntity<>(ErrorResponseDto.res(notFoundException), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(res(notFoundException), HttpStatus.NOT_FOUND);
     }
 
     //UnauthorizedException  핸들러
@@ -51,7 +55,31 @@ public class ExceptionController {
             UnauthorizedException unauthorizedException) {
 
         this.writeLog(unauthorizedException);
-        return new ResponseEntity<>(ErrorResponseDto.res(unauthorizedException), HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(res(unauthorizedException), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponseDto> handleConflictException(BadRequestException badRequestException) {
+        writeLog(badRequestException);
+        return new ResponseEntity<>(res(badRequestException), HttpStatus.BAD_REQUEST);
+    }
+
+    // Dto 검증 어노테이션 예외 제외
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponseDto> handleMethodArgumentNotValidException(MethodArgumentNotValidException methodArgumentNotValidException) {
+        FieldError fieldError = methodArgumentNotValidException.getBindingResult().getFieldError();
+        if (fieldError == null) {
+            return new ResponseEntity<>(res(String.valueOf(HttpStatus.BAD_REQUEST.value())
+                    , methodArgumentNotValidException), HttpStatus.BAD_REQUEST);
+        }
+        ErrorCode errorCode = ErrorCode.resolveValidationErrorCode(fieldError.getCode());
+        String detail = fieldError.getDefaultMessage();
+        DtoValidationException dtoValidationException = new DtoValidationException(errorCode, detail);
+
+        this.writeLog(dtoValidationException);
+
+        return new ResponseEntity<>(res(dtoValidationException), HttpStatus.BAD_REQUEST);
     }
 
 
@@ -62,7 +90,7 @@ public class ExceptionController {
     public ResponseEntity<ErrorResponseDto> handleException(Exception exception) {
         this.writeLog(exception);
         return new ResponseEntity<>(
-                ErrorResponseDto.res(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()), exception),
+                res(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()), exception),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -77,4 +105,5 @@ public class ExceptionController {
     private void writeLog(Exception exception) {
         log.error("({}){}", exception.getClass().getSimpleName(), exception.getMessage());
     }
+
 }

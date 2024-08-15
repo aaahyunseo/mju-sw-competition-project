@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,6 +17,12 @@ import java.util.List;
 @Getter
 @Table(name = "users")
 public class User extends BaseEntity{
+    //이름
+    private String name;
+
+    //전공(소속)
+    @Column(nullable = false)
+    private String major;
 
     //학번
     @Column(nullable = false)
