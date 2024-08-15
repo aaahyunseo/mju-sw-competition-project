@@ -1,4 +1,4 @@
-package com.example.swcompetitionproject.dto.request;
+package com.example.swcompetitionproject.dto.request.user;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
