@@ -1,13 +1,14 @@
 package com.example.swcompetitionproject.controller;
 
 import com.example.swcompetitionproject.authentication.AuthenticatedUser;
-import com.example.swcompetitionproject.dto.request.CreateBoardDto;
-import com.example.swcompetitionproject.dto.request.UpdateBoardDto;
-import com.example.swcompetitionproject.dto.response.BoardData;
-import com.example.swcompetitionproject.dto.response.BoardListData;
+import com.example.swcompetitionproject.dto.request.board.CreateBoardDto;
+import com.example.swcompetitionproject.dto.request.board.UpdateBoardDto;
+import com.example.swcompetitionproject.dto.response.board.BoardData;
+import com.example.swcompetitionproject.dto.response.board.BoardListData;
 import com.example.swcompetitionproject.dto.response.ResponseDto;
 import com.example.swcompetitionproject.entity.User;
 import com.example.swcompetitionproject.service.BoardService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class BoardController {
     //게시글 작성
     @PostMapping
     public ResponseEntity<ResponseDto<Void>> createBoard(@RequestParam(value = "dormitory")String dormitory,
-                                                         @RequestBody CreateBoardDto createBoardDto,
+                                                         @Valid @RequestBody CreateBoardDto createBoardDto,
                                                          @AuthenticatedUser User user) {
         boardService.createBoard(dormitory, createBoardDto, user);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "게시글 작성 완료"), HttpStatus.CREATED);
@@ -48,7 +49,7 @@ public class BoardController {
     @PatchMapping("/{boardId}")
     public ResponseEntity<ResponseDto<Void>> updateBoard(@RequestParam(value = "dormitory")String dormitory,
                                                          @PathVariable UUID boardId,
-                                                         @RequestBody UpdateBoardDto updateBoardDto,
+                                                         @Valid @RequestBody UpdateBoardDto updateBoardDto,
                                                          @AuthenticatedUser User user) {
         boardService.updateBoard(dormitory, boardId, updateBoardDto, user);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 수정 완료"), HttpStatus.OK);
