@@ -15,6 +15,7 @@ public class BoardData {
     private String title;
     private String content;
     private List<String> categoryList;
+    private int current;
     private int total;
     private String createdAt;
 
@@ -24,6 +25,7 @@ public class BoardData {
                 .title(board.getTitle())
                 .content(board.getContent())
                 .categoryList(board.getUser().getCategory())
+                .current(board.getChattingRoom().getMemberCount())
                 .total(board.getTotal())
                 .createdAt(board.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
                 .build();
