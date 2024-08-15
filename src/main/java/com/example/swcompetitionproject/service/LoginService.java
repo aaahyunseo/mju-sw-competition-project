@@ -1,7 +1,7 @@
 package com.example.swcompetitionproject.service;
 
 import com.example.swcompetitionproject.authentication.JwtTokenProvider;
-import com.example.swcompetitionproject.dto.request.LoginDto;
+import com.example.swcompetitionproject.dto.request.auth.LoginDto;
 import com.example.swcompetitionproject.dto.response.TokenResponseDto;
 import com.example.swcompetitionproject.entity.User;
 import com.example.swcompetitionproject.exception.ErrorCode;

@@ -3,6 +3,7 @@ package com.example.swcompetitionproject.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
@@ -13,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Getter
 @Table(name = "users")
 public class User extends BaseEntity{
     //이름
@@ -22,18 +24,13 @@ public class User extends BaseEntity{
     @Column(nullable = false)
     private String major;
 
-    ////구분
-    //@Column(nullable = false)
-    //private String division;
-
-    ////학년
-    //@Column(nullable = false)
-    //private int grade;
-
     //학번
     @Column(nullable = false)
     private String studentNumber;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Board> boards;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserRoom> userRooms;
 }

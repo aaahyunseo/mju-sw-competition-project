@@ -11,12 +11,15 @@ public enum ErrorCode {
 
     //UnauthorizedException
     INVALID_TOKEN("4010","유효하지 않은 토큰입니다."),
+    INVALID_DORMITORY("4042","유효하지 않은 기숙사입니다."),
 
     //ForbiddenException
 
     //NotFoundException
     COOKIE_NOT_FOUND("4040","쿠키를 찾을 수 없습니다."),
     USER_NOT_FOUND("4041","유저를 찾을 수 없습니다."),
+    ROOM_NOT_FOUND("4042","방을 찾을 수 없습니다."),
+    BOARD_NOT_FOUND("4043","게시글을 찾을 수 없습니다."),
 
     //ConflictException
 

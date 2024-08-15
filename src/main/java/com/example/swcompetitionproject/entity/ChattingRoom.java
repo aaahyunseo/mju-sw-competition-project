@@ -1,9 +1,7 @@
 package com.example.swcompetitionproject.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -11,6 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Getter
 @Table(name = "chatting_rooms")
 public class ChattingRoom extends BaseEntity {
     //방이름
@@ -23,10 +22,10 @@ public class ChattingRoom extends BaseEntity {
 
     //현재 채팅방에 들어있는 인원 수
     @Column(nullable = false)
-    private int member_count;
+    private int memberCount;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="board_id")
+    @JoinColumn(name = "board_id")
     private Board board;
 
     @OneToMany(mappedBy = "chattingRoom", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -34,4 +33,11 @@ public class ChattingRoom extends BaseEntity {
 
     @OneToMany(mappedBy = "chattingRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages;
+
+    @OneToMany(mappedBy = "chattingRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserRoom> userRooms;
+
+    public void setMemberCount(int memberCount) {
+        this.memberCount = memberCount;
+    }
 }

@@ -9,15 +9,11 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-@Table(name = "messages")
-public class Message extends BaseEntity {
-    //메세지 내용
-    @Column(nullable = false)
-    private String content;
-
-    //발신자
-    @Column(nullable = false)
-    private String sender;
+@Table(name = "user_rooms")
+public class UserRoom extends BaseEntity{
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chattingRoom_id")
