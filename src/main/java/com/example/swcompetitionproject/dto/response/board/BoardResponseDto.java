@@ -1,24 +1,21 @@
-package com.example.swcompetitionproject.dto.response;
+package com.example.swcompetitionproject.dto.response.board;
 
 import com.example.swcompetitionproject.entity.Board;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
 import java.util.UUID;
 
 @Builder
 @Getter
-public class BoardDto {
+public class BoardResponseDto {
     private UUID id;
     private String title;
-    private List<String> category;
 
-    public static BoardDto from(Board board){
-        return BoardDto.builder()
+    public static BoardResponseDto from(Board board){
+        return BoardResponseDto.builder()
                 .id(board.getId())
                 .title(board.getTitle())
-                .category(board.getCategory())
                 .build();
     }
 }
