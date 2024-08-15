@@ -13,4 +13,5 @@ public interface BoardRepository extends JpaRepository<Board, UUID> {
     List<Board> findAllByDormitory(DormitoryType dormitory);
     Optional<Board> findBoardByDormitoryAndId(DormitoryType dormitory, UUID id);
     Optional<Board> findBoardByDormitoryAndIdAndUser(DormitoryType dormitory, UUID id, User user);
+    List<Board> findAllByUser(User user);
 }
