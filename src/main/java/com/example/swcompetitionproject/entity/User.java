@@ -27,9 +27,17 @@ public class User extends BaseEntity{
     @Column(nullable = false)
     private String studentNumber;
 
+    //카테고리
+    @ElementCollection
+    @CollectionTable(name = "board_categories", joinColumns = @JoinColumn(name = "board_id"))
+    @Column(name = "category", nullable = false)
+    private List<String> category;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Board> boards;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserRoom> userRooms;
+
+
 }
