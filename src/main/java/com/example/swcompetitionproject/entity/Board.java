@@ -35,7 +35,6 @@ public class Board extends BaseEntity {
     private User user;
 
     @OneToOne(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
-    @JoinColumn(name="chattingRoom_id")
     private ChattingRoom chattingRoom;
 
     public Board setContent(String content){

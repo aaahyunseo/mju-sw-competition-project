@@ -15,5 +15,4 @@ public class UpdateBoardDto {
     @NotBlank(message = "게시글 내용을 입력하세요.")
     @Size(max = 500)
     private String content;
-    private int total;
 }

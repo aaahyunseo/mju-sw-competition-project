@@ -80,23 +80,7 @@ public class BoardService {
     public void updateBoard(String dormitory, UUID boardId, UpdateBoardDto updateBoardDto, User user) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
         Board updateBoard = boardValidate(dormitoryType, boardId, user);
-
         updateBoard.setContent(updateBoardDto.getContent());
-
-        switch (dormitoryType) {
-            case DORMITORY4:
-                updateBoard.setTotal(2);
-                break;
-            case DORMITORY5:
-            case MYOUNGDEOK:
-                updateBoard.setTotal(4);
-                break;
-            default:
-                if (updateBoard.getTotal() == 0) throw new UnauthorizedException(ErrorCode.NOT_BLANK);
-                updateBoard.setTotal(updateBoard.getTotal());
-                break;
-        }
-
         boardRepository.save(updateBoard);
     }
 
