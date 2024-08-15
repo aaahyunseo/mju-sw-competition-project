@@ -43,7 +43,7 @@ public class MyPageService {
     /**
      * 나의 게시판 조회
      */
-    public MyBoardListData getUserBoard(User user){
+    public MyBoardListData getMyBoard(User user){
         //내가 작성한 모든 게시판 찾기
         List<Board> myBoards=boardRepository.findAllByUser(user);
 

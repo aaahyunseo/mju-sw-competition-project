@@ -41,8 +41,8 @@ public class MypageController {
      * 나의 게시판 조회
      */
     @GetMapping("/board")
-    public ResponseEntity<ResponseDto<MyBoardListData>> getUserBoard(@AuthenticatedUser User user){
-        MyBoardListData myBoards=myPageService.getUserBoard(user);
+    public ResponseEntity<ResponseDto<MyBoardListData>> getMyrBoard(@AuthenticatedUser User user){
+        MyBoardListData myBoards=myPageService.getMyBoard(user);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK,"나의 게시판 조회 완료",myBoards),HttpStatus.OK);
     }
 }
