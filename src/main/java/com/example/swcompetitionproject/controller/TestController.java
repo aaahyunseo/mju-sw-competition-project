@@ -1,4 +1,4 @@
-package controller;
+package com.example.swcompetitionproject.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
