@@ -1,18 +1,16 @@
 package com.example.swcompetitionproject.controller;
 
 import com.example.swcompetitionproject.authentication.AuthenticatedUser;
-import com.example.swcompetitionproject.dto.request.ModifyUserNameDto;
+import com.example.swcompetitionproject.dto.request.user.ModifyUserNameDto;
 import com.example.swcompetitionproject.dto.response.ResponseDto;
+import com.example.swcompetitionproject.dto.response.user.UserResponseDto;
 import com.example.swcompetitionproject.entity.User;
 import com.example.swcompetitionproject.service.MyPageService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
 @RestController
@@ -28,4 +26,14 @@ public class MypageController {
         myPageService.modifyUserName(user,modifyUserNameDto);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "이름 수정 완료"), HttpStatus.OK);
     }
+
+    /**
+     * 유저 정보 조회
+     */
+    @GetMapping("/info")
+    public ResponseEntity<ResponseDto<UserResponseDto>> getUserInfo(@AuthenticatedUser User user){
+        UserResponseDto userResponseDto= myPageService.getUserInfo(user);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK,"유저 정보 조회 완료",userResponseDto),HttpStatus.OK);
+    }
+
 }
