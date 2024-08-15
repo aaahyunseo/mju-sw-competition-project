@@ -1,7 +1,7 @@
 package com.example.swcompetitionproject.controller;
 
 import com.example.swcompetitionproject.authentication.AuthenticatedUser;
-import com.example.swcompetitionproject.dto.request.ModifyUserNameDto;
+import com.example.swcompetitionproject.dto.request.user.ModifyUserNameDto;
 import com.example.swcompetitionproject.dto.response.ResponseDto;
 import com.example.swcompetitionproject.entity.User;
 import com.example.swcompetitionproject.service.MyPageService;
