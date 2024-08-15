@@ -1,6 +1,6 @@
 package com.example.swcompetitionproject.service;
 
-import com.example.swcompetitionproject.dto.request.ModifyUserNameDto;
+import com.example.swcompetitionproject.dto.request.user.ModifyUserNameDto;
 import com.example.swcompetitionproject.entity.User;
 import com.example.swcompetitionproject.repository.UserRepository;
 import lombok.AllArgsConstructor;
