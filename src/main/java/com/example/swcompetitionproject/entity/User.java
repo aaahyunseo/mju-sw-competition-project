@@ -28,7 +28,6 @@ public class User extends BaseEntity{
     private String studentNumber;
 
     //카테고리
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Category> category;
 
@@ -37,6 +36,4 @@ public class User extends BaseEntity{
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserRoom> userRooms;
-
-
 }

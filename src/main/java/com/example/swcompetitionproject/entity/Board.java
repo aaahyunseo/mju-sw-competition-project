@@ -1,10 +1,9 @@
 package com.example.swcompetitionproject.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.List;
 
 @Builder
 @AllArgsConstructor
@@ -37,12 +36,12 @@ public class Board extends BaseEntity {
     @OneToOne(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
     private ChattingRoom chattingRoom;
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Setter
+    private List<BoardCategory> boardCategories;
+
     public Board setContent(String content){
         this.content = content;
-        return this;
-    }
-    public Board setTotal(int total){
-        this.total = total;
         return this;
     }
 }
