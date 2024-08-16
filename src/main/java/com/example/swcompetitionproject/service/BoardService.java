@@ -28,7 +28,7 @@ public class BoardService {
      * **/
     public BoardListData getBoardList(String dormitory){
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
-        List<Board> boards = boardRepository.findAllByDormitory(dormitoryType);
+        List<Board> boards = boardRepository.findAllByDormitoryOrderByCreatedAtDesc(dormitoryType);
         return BoardListData.from(boards);
     }
 
@@ -45,14 +45,28 @@ public class BoardService {
     /**
      * 게시글 작성
      * **/
-    public void createBoard(String dormitory, CreateBoardDto createBoardDto, User user){
+    public void createBoard(String dormitory, CreateBoardDto createBoardDto, User user) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
+
+        switch (dormitoryType) {
+            case DORMITORY4:
+                createBoardDto.setTotal(2);
+                break;
+            case DORMITORY5:
+            case MYOUNGDEOK:
+                createBoardDto.setTotal(4);
+                break;
+            default:
+                if (createBoardDto.getTotal() == 0) throw new UnauthorizedException(ErrorCode.NOT_BLANK);
+                break;
+        }
 
         Board newBoard = Board.builder()
                 .user(user)
                 .title(createBoardDto.getTitle())
                 .content(createBoardDto.getContent())
                 .dormitory(dormitoryType)
+                .total(createBoardDto.getTotal())
                 .build();
 
         //게시글 작성 완료와 동시에 채팅방 생성
@@ -63,10 +77,9 @@ public class BoardService {
     /**
      * 게시글 수정
      * **/
-    public void updateBoard(String dormitory, UUID boardId, UpdateBoardDto updateBoardDto, User user){
+    public void updateBoard(String dormitory, UUID boardId, UpdateBoardDto updateBoardDto, User user) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
         Board updateBoard = boardValidate(dormitoryType, boardId, user);
-
         updateBoard.setContent(updateBoardDto.getContent());
         boardRepository.save(updateBoard);
     }

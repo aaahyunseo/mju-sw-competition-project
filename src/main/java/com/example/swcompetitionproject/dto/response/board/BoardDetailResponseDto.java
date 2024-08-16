@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Builder
 @Getter
-public class BoardData {
+public class BoardDetailResponseDto {
     private UUID id;
     private String title;
     private String content;
@@ -19,8 +19,8 @@ public class BoardData {
     private int total;
     private String createdAt;
 
-    public static BoardData from(Board board){
-        return BoardData.builder()
+    public static BoardDetailResponseDto from(Board board){
+        return BoardDetailResponseDto.builder()
                 .id(board.getId())
                 .title(board.getTitle())
                 .content(board.getContent())
