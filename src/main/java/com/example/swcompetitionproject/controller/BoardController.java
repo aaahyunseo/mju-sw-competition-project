@@ -24,21 +24,21 @@ public class BoardController {
 
     //게시글 전체 조회
     @GetMapping
-    public ResponseEntity<ResponseDto<BoardListData>> getBoardList(@RequestParam(value = "dormitory")String dormitory) {
+    public ResponseEntity<ResponseDto<BoardListData>> getBoardList(@RequestParam(value = "dormitory") String dormitory) {
         BoardListData boardListData = boardService.getBoardList(dormitory);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 목록 조회 완료", boardListData), HttpStatus.OK);
     }
 
     //게시글 상세 조회
     @GetMapping("/{boardId}")
-    public ResponseEntity<ResponseDto<BoardData>> getBoardById(@RequestParam(value = "dormitory")String dormitory, @PathVariable UUID boardId) {
+    public ResponseEntity<ResponseDto<BoardData>> getBoardById(@RequestParam(value = "dormitory") String dormitory, @PathVariable UUID boardId) {
         BoardData boardDto = boardService.getBoardById(dormitory, boardId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 조회 완료", boardDto), HttpStatus.OK);
     }
 
     //게시글 작성
     @PostMapping
-    public ResponseEntity<ResponseDto<Void>> createBoard(@RequestParam(value = "dormitory")String dormitory,
+    public ResponseEntity<ResponseDto<Void>> createBoard(@RequestParam(value = "dormitory") String dormitory,
                                                          @Valid @RequestBody CreateBoardDto createBoardDto,
                                                          @AuthenticatedUser User user) {
         boardService.createBoard(dormitory, createBoardDto, user);
@@ -47,7 +47,7 @@ public class BoardController {
 
     //게시글 수정
     @PatchMapping("/{boardId}")
-    public ResponseEntity<ResponseDto<Void>> updateBoard(@RequestParam(value = "dormitory")String dormitory,
+    public ResponseEntity<ResponseDto<Void>> updateBoard(@RequestParam(value = "dormitory") String dormitory,
                                                          @PathVariable UUID boardId,
                                                          @Valid @RequestBody UpdateBoardDto updateBoardDto,
                                                          @AuthenticatedUser User user) {
@@ -58,7 +58,7 @@ public class BoardController {
 
     //게시글 삭제
     @DeleteMapping("/{boardId}")
-    public ResponseEntity<ResponseDto<Void>> deleteBoard(@RequestParam(value = "dormitory")String dormitory,
+    public ResponseEntity<ResponseDto<Void>> deleteBoard(@RequestParam(value = "dormitory") String dormitory,
                                                          @PathVariable UUID boardId,
                                                          @AuthenticatedUser User user) {
         boardService.deleteBoard(dormitory, boardId, user);
