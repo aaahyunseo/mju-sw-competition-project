@@ -16,7 +16,7 @@ import java.util.List;
 @Entity
 @Getter
 @Table(name = "users")
-public class User extends BaseEntity{
+public class User extends BaseEntity {
     //이름
     private String name;
 

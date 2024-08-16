@@ -16,8 +16,8 @@ public class MainPageService {
 
     /**
      * 기숙사 별 게시글 수 조회하기
-     * **/
-    public MainPageResponseData getBoardCount(String dormitory){
+     **/
+    public MainPageResponseData getBoardCount(String dormitory) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
         int count = boardRepository.countByDormitory(dormitoryType);
 
@@ -29,12 +29,13 @@ public class MainPageService {
 
     /**
      * 기숙사 이름 검증 로직
-     * **/
-    public DormitoryType dormitoryNameValidate(String dormitory){
-        for (DormitoryType type : DormitoryType.values()){
-            if (type.name().equals(dormitory.toUpperCase())){
+     **/
+    public DormitoryType dormitoryNameValidate(String dormitory) {
+        for (DormitoryType type : DormitoryType.values()) {
+            if (type.name().equals(dormitory.toUpperCase())) {
                 return type;
             }
-        } throw new UnauthorizedException(ErrorCode.INVALID_DORMITORY);
+        }
+        throw new UnauthorizedException(ErrorCode.INVALID_DORMITORY);
     }
 }

@@ -14,5 +14,4 @@ public class UserResponseDto {
 
     //학번
     private String studentNumber;
-
 }

@@ -16,7 +16,7 @@ public class MyBoardResponseDto {
     private LocalDateTime createdAt;
     private DormitoryType dormitory;
 
-    public static MyBoardResponseDto from(Board board){
+    public static MyBoardResponseDto from(Board board) {
         return MyBoardResponseDto.builder()
                 .id(board.getId())
                 .title(board.getTitle())

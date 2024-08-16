@@ -29,26 +29,26 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto<Void>> login(@RequestBody @Valid LoginDto loginDto, HttpServletResponse response) {
         try {
-            TokenResponseDto tokenResponseDto=loginService.login(loginDto);
+            TokenResponseDto tokenResponseDto = loginService.login(loginDto);
             String bearerToken = JwtEncoder.encode(tokenResponseDto.getAccessToken());
 
             ResponseCookie cookie = ResponseCookie.from(AuthenticationExtractor.TOKEN_COOKIE_NAME, bearerToken)
-                    .maxAge(Duration.ofMillis(1800000*2))
+                    .maxAge(Duration.ofMillis(1800000 * 2))
                     .path("/")
                     .httpOnly(true)
                     .sameSite("None").secure(true)
                     .build();
             response.addHeader("set-cookie", cookie.toString());
 
-            return new ResponseEntity<>(LoginResponseDto.loginres(HttpStatus.CREATED, "학교 계정으로 로그인 완료",bearerToken), HttpStatus.CREATED);
+            return new ResponseEntity<>(LoginResponseDto.loginres(HttpStatus.CREATED, "학교 계정으로 로그인 완료", bearerToken), HttpStatus.CREATED);
         } catch (Exception e) {
 
-            return new ResponseEntity<>(LoginResponseDto.loginres(HttpStatus.UNAUTHORIZED, "학교 계정으로 로그인 실패",null), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(LoginResponseDto.loginres(HttpStatus.UNAUTHORIZED, "학교 계정으로 로그인 실패", null), HttpStatus.UNAUTHORIZED);
         }
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<ResponseDto<Void>> logout(final HttpServletResponse response){
+    public ResponseEntity<ResponseDto<Void>> logout(final HttpServletResponse response) {
 
         ResponseCookie cookie = ResponseCookie.from(AuthenticationExtractor.TOKEN_COOKIE_NAME, null)
                 .maxAge(Duration.ofMillis(0))

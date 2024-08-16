@@ -64,7 +64,7 @@ public class MypageController {
      */
     @DeleteMapping("/category/{categoryid}")
     public ResponseEntity<ResponseDto<Void>> deleteUserCategory(@AuthenticatedUser User user, @PathVariable UUID categoryid) {
-        myPageService.deleteUserCategory(user,categoryid);
+        myPageService.deleteUserCategory(user, categoryid);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "유저 카테고리 삭제 완료", null), HttpStatus.OK);
     }
 
@@ -73,7 +73,7 @@ public class MypageController {
      */
     @GetMapping("/category")
     public ResponseEntity<ResponseDto<CategoryListData>> getUserCategoryList(@AuthenticatedUser User user) {
-        CategoryListData categoryList=myPageService.getUserCategoryList(user);
+        CategoryListData categoryList = myPageService.getUserCategoryList(user);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "유저 카테고리 전체 조회 완료", categoryList), HttpStatus.OK);
     }
 }

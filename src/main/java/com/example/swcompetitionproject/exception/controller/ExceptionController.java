@@ -82,8 +82,6 @@ public class ExceptionController {
         return new ResponseEntity<>(res(validationException), HttpStatus.BAD_REQUEST);
     }
 
-
-
     // 원인을 알 수 없는 예외 처리
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
@@ -105,5 +103,4 @@ public class ExceptionController {
     private void writeLog(Exception exception) {
         log.error("({}){}", exception.getClass().getSimpleName(), exception.getMessage());
     }
-
 }
