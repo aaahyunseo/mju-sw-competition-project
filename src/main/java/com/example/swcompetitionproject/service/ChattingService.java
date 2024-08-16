@@ -99,7 +99,7 @@ public class ChattingService {
     }
 
     // 채팅방 삭제하기
-    public void deleteRoom(Board board){
+    public void deleteRoom(Board board) {
         chattingRoomRepository.deleteByBoard(board);
     }
 }
