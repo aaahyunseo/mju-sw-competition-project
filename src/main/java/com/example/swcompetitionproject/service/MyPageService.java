@@ -7,6 +7,8 @@ import com.example.swcompetitionproject.dto.response.user.UserResponseDto;
 import com.example.swcompetitionproject.entity.Board;
 import com.example.swcompetitionproject.entity.Category;
 import com.example.swcompetitionproject.entity.User;
+import com.example.swcompetitionproject.exception.ErrorCode;
+import com.example.swcompetitionproject.exception.NotFoundException;
 import com.example.swcompetitionproject.repository.BoardRepository;
 import com.example.swcompetitionproject.repository.CategoryRepository;
 import com.example.swcompetitionproject.repository.UserRepository;
@@ -14,6 +16,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -70,4 +73,13 @@ public class MyPageService {
         categoryRepository.save(newCategory);
     }
 
+    /**
+     * 유저 카테고리 삭제
+     */
+    public void deleteUserCategory(User user, UUID categoryId){
+        Category category=categoryRepository.findById(categoryId)
+                .orElseThrow( () -> new NotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
+
+        categoryRepository.delete(category);
+    }
 }
