@@ -51,9 +51,9 @@ public class MyPageService {
     /**
      * 나의 게시판 조회
      */
-    public MyBoardListData getMyBoard(User user){
+    public MyBoardListData getMyBoard(User user) {
         //내가 작성한 모든 게시판 찾기
-        List<Board> myBoards=boardRepository.findAllByUser(user);
+        List<Board> myBoards = boardRepository.findAllByUser(user);
 
         //데이터 리스트로 만들기
         MyBoardListData myBoardListData = MyBoardListData.from(myBoards);
@@ -64,9 +64,9 @@ public class MyPageService {
     /**
      * 유저 카테고리 추가
      */
-    public void creatUserCatedory(User user, CreateUserCategoryDto createUserCategoryDto){
+    public void creatUserCatedory(User user, CreateUserCategoryDto createUserCategoryDto) {
 
-        Category newCategory= Category.builder()
+        Category newCategory = Category.builder()
                 .category(createUserCategoryDto.getCategory())
                 .user(user)
                 .build();
@@ -77,9 +77,9 @@ public class MyPageService {
     /**
      * 유저 카테고리 삭제
      */
-    public void deleteUserCategory(UUID categoryId){
-        Category category=categoryRepository.findById(categoryId)
-                .orElseThrow( () -> new NotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
+    public void deleteUserCategory(User user, UUID categoryId) {
+        Category category = categoryRepository.findByUserAndId(user,categoryId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
         categoryRepository.delete(category);
     }
@@ -87,8 +87,8 @@ public class MyPageService {
     /**
      * 유저 카테고리 전체 조회
      */
-    public CategoryListData getUserCategoryList(User user){
-        List<Category> categories= categoryRepository.findAllByUser(user);
+    public CategoryListData getUserCategoryList(User user) {
+        List<Category> categories = categoryRepository.findAllByUser(user);
         return CategoryListData.from(categories);
     }
 }
