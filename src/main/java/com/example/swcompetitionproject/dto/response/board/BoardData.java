@@ -14,7 +14,7 @@ public class BoardData {
     private UUID id;
     private String title;
     private String content;
-    private List<String> categoryList;
+    //private List<String> categoryList;
     private int current;
     private int total;
     private String createdAt;
@@ -24,7 +24,7 @@ public class BoardData {
                 .id(board.getId())
                 .title(board.getTitle())
                 .content(board.getContent())
-                .categoryList(board.getUser().getCategory())
+                //.categoryList(board.getUser().getCategory())
                 .current(board.getChattingRoom().getMemberCount())
                 .total(board.getTotal())
                 .createdAt(board.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
