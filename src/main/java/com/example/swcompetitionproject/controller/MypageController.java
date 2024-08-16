@@ -5,6 +5,7 @@ import com.example.swcompetitionproject.dto.request.user.CreateUserCategoryDto;
 import com.example.swcompetitionproject.dto.request.user.ModifyUserNameDto;
 import com.example.swcompetitionproject.dto.response.ResponseDto;
 import com.example.swcompetitionproject.dto.response.board.MyBoardListData;
+import com.example.swcompetitionproject.dto.response.category.CategoryListData;
 import com.example.swcompetitionproject.dto.response.user.UserResponseDto;
 import com.example.swcompetitionproject.entity.User;
 import com.example.swcompetitionproject.service.MyPageService;
@@ -63,7 +64,16 @@ public class MypageController {
      */
     @DeleteMapping("/category/{categoryid}")
     public ResponseEntity<ResponseDto<Void>> deleteUserCategory(@AuthenticatedUser User user, @PathVariable UUID categoryid) {
-        myPageService.deleteUserCategory(user, categoryid);
+        myPageService.deleteUserCategory(categoryid);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "유저 카테고리 삭제 완료", null), HttpStatus.OK);
+    }
+
+    /**
+     * 유저 카테고리 전체 조회
+     */
+    @GetMapping("/category")
+    public ResponseEntity<ResponseDto<CategoryListData>> getUserCategoryList(@AuthenticatedUser User user) {
+        CategoryListData categoryList=myPageService.getUserCategoryList(user);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "유저 카테고리 전체 조회 완료", categoryList), HttpStatus.OK);
     }
 }
