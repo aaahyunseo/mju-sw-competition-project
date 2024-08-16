@@ -1,11 +1,14 @@
 package com.example.swcompetitionproject.service;
 
+import com.example.swcompetitionproject.dto.request.user.CreateUserCategoryDto;
 import com.example.swcompetitionproject.dto.request.user.ModifyUserNameDto;
 import com.example.swcompetitionproject.dto.response.board.MyBoardListData;
 import com.example.swcompetitionproject.dto.response.user.UserResponseDto;
 import com.example.swcompetitionproject.entity.Board;
+import com.example.swcompetitionproject.entity.Category;
 import com.example.swcompetitionproject.entity.User;
 import com.example.swcompetitionproject.repository.BoardRepository;
+import com.example.swcompetitionproject.repository.CategoryRepository;
 import com.example.swcompetitionproject.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,7 @@ public class MyPageService {
 
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
+    private final CategoryRepository categoryRepository;
 
     /**
      * 유저 이름 변경
@@ -51,6 +55,19 @@ public class MyPageService {
         MyBoardListData myBoardListData = MyBoardListData.from(myBoards);
 
         return myBoardListData;
+    }
+
+    /**
+     * 유저 카테고리 추가
+     */
+    public void creatUserCatedory(User user, CreateUserCategoryDto createUserCategoryDto){
+
+        Category newCategory= Category.builder()
+                .category(createUserCategoryDto.getCategory())
+                .user(user)
+                .build();
+
+        categoryRepository.save(newCategory);
     }
 
 }
