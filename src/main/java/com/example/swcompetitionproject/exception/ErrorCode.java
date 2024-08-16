@@ -20,6 +20,7 @@ public enum ErrorCode {
     USER_NOT_FOUND("4041","유저를 찾을 수 없습니다."),
     ROOM_NOT_FOUND("4042","방을 찾을 수 없습니다."),
     BOARD_NOT_FOUND("4043","게시글을 찾을 수 없습니다."),
+    CATEGORY_NOT_FOUND("4044","카테고리를 찾을 수 없습니다"),
 
     //ConflictException
 

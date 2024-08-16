@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @AllArgsConstructor
 @RestController
 @RequestMapping("/users")
@@ -54,5 +56,14 @@ public class MypageController {
     public ResponseEntity<ResponseDto<Void>> creatUserCategory(@AuthenticatedUser User user, @RequestBody CreateUserCategoryDto createUserCategoryDto) {
         myPageService.creatUserCatedory(user, createUserCategoryDto);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "유저 카테고리 추가 완료", null), HttpStatus.OK);
+    }
+
+    /**
+     * 유저 카테고리 삭제
+     */
+    @DeleteMapping("/category/{categoryid}")
+    public ResponseEntity<ResponseDto<Void>> deleteUserCategory(@AuthenticatedUser User user, @PathVariable UUID categoryid) {
+        myPageService.deleteUserCategory(user, categoryid);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "유저 카테고리 삭제 완료", null), HttpStatus.OK);
     }
 }
