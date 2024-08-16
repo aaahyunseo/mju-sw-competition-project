@@ -1,6 +1,7 @@
 package com.example.swcompetitionproject.controller;
 
 import com.example.swcompetitionproject.authentication.AuthenticatedUser;
+import com.example.swcompetitionproject.dto.request.user.CreateUserCategoryDto;
 import com.example.swcompetitionproject.dto.request.user.ModifyUserNameDto;
 import com.example.swcompetitionproject.dto.response.ResponseDto;
 import com.example.swcompetitionproject.dto.response.board.MyBoardListData;
@@ -44,5 +45,14 @@ public class MypageController {
     public ResponseEntity<ResponseDto<MyBoardListData>> getMyrBoard(@AuthenticatedUser User user){
         MyBoardListData myBoards=myPageService.getMyBoard(user);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK,"나의 게시판 조회 완료",myBoards),HttpStatus.OK);
+    }
+
+    /**
+     * 유저 카테고리 추가
+     */
+    @PostMapping("/category")
+    public ResponseEntity<ResponseDto<Void>> creatUserCategory(@AuthenticatedUser User user, @RequestBody CreateUserCategoryDto createUserCategoryDto){
+        myPageService.creatUserCatedory(user, createUserCategoryDto);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK,"유저 카테고리 추가 완료",null),HttpStatus.OK);
     }
 }
