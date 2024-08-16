@@ -64,7 +64,7 @@ public class MypageController {
      */
     @DeleteMapping("/category/{categoryid}")
     public ResponseEntity<ResponseDto<Void>> deleteUserCategory(@AuthenticatedUser User user, @PathVariable UUID categoryid) {
-        myPageService.deleteUserCategory(categoryid);
+        myPageService.deleteUserCategory(user,categoryid);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "유저 카테고리 삭제 완료", null), HttpStatus.OK);
     }
 
