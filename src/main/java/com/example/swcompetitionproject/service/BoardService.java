@@ -5,6 +5,7 @@ import com.example.swcompetitionproject.dto.request.board.UpdateBoardDto;
 import com.example.swcompetitionproject.dto.response.board.BoardData;
 import com.example.swcompetitionproject.dto.response.board.BoardListData;
 import com.example.swcompetitionproject.entity.Board;
+import com.example.swcompetitionproject.entity.BoardCategory;
 import com.example.swcompetitionproject.entity.DormitoryType;
 import com.example.swcompetitionproject.entity.User;
 import com.example.swcompetitionproject.exception.ErrorCode;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +27,8 @@ public class BoardService {
 
     /**
      * 게시글 전체 조회
-     * **/
-    public BoardListData getBoardList(String dormitory){
+     **/
+    public BoardListData getBoardList(String dormitory) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
         List<Board> boards = boardRepository.findAllByDormitoryOrderByCreatedAtDesc(dormitoryType);
         return BoardListData.from(boards);
@@ -34,17 +36,17 @@ public class BoardService {
 
     /**
      * 게시글 상세 조회
-     * **/
-    public BoardData getBoardById(String dormitory, UUID boardId){
+     **/
+    public BoardData getBoardById(String dormitory, UUID boardId) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
         Board board = boardRepository.findBoardByDormitoryAndId(dormitoryType, boardId)
-                .orElseThrow( () -> new NotFoundException(ErrorCode.BOARD_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.BOARD_NOT_FOUND));
         return BoardData.from(board);
     }
 
     /**
      * 게시글 작성
-     * **/
+     **/
     public void createBoard(String dormitory, CreateBoardDto createBoardDto, User user) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
 
@@ -69,6 +71,17 @@ public class BoardService {
                 .total(createBoardDto.getTotal())
                 .build();
 
+        //유저의 카테고리를 불러와 BoardCategory 생성
+        List<BoardCategory> boardCategories = user.getCategory().stream()
+                .map(category -> BoardCategory.builder()
+                        .board(newBoard)
+                        .category(category)
+                        .build())
+                .collect(Collectors.toList());
+
+        //생성된 BoardCategory 리스트를 Board에 저장
+        newBoard.setBoardCategories(boardCategories);
+
         //게시글 작성 완료와 동시에 채팅방 생성
         boardRepository.save(newBoard);
         chattingService.createRoom(user, newBoard);
@@ -76,7 +89,7 @@ public class BoardService {
 
     /**
      * 게시글 수정
-     * **/
+     **/
     public void updateBoard(String dormitory, UUID boardId, UpdateBoardDto updateBoardDto, User user) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
         Board updateBoard = boardValidate(dormitoryType, boardId, user);
@@ -86,8 +99,8 @@ public class BoardService {
 
     /**
      * 게시글 삭제
-     * **/
-    public void deleteBoard(String dormitory, UUID boardId, User user){
+     **/
+    public void deleteBoard(String dormitory, UUID boardId, User user) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
         Board board = boardValidate(dormitoryType, boardId, user);
         boardRepository.delete(board);
@@ -96,21 +109,22 @@ public class BoardService {
 
     /**
      * 게시글 존재 여부 확인 로직
-     * **/
-    public Board boardValidate(DormitoryType dormitoryType, UUID boardId, User user){
+     **/
+    public Board boardValidate(DormitoryType dormitoryType, UUID boardId, User user) {
         return boardRepository.findBoardByDormitoryAndIdAndUser(dormitoryType, boardId, user)
-                .orElseThrow( () -> new NotFoundException(ErrorCode.BOARD_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.BOARD_NOT_FOUND));
     }
 
     /**
      * 기숙사 이름 검증 로직
-     * **/
-    public DormitoryType dormitoryNameValidate(String dormitory){
-        for (DormitoryType type : DormitoryType.values()){
-            if (type.name().equals(dormitory.toUpperCase())){
+     **/
+    public DormitoryType dormitoryNameValidate(String dormitory) {
+        for (DormitoryType type : DormitoryType.values()) {
+            if (type.name().equals(dormitory.toUpperCase())) {
                 return type;
             }
-        } throw new UnauthorizedException(ErrorCode.INVALID_DORMITORY);
+        }
+        throw new UnauthorizedException(ErrorCode.INVALID_DORMITORY);
     }
 }
 
