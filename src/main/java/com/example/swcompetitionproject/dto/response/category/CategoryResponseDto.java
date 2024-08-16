@@ -12,7 +12,7 @@ public class CategoryResponseDto {
     private UUID id;
     private String category;
 
-    public static CategoryResponseDto from(Category category){
+    public static CategoryResponseDto from(Category category) {
         return CategoryResponseDto.builder()
                 .id(category.getId())
                 .category(category.getCategory())

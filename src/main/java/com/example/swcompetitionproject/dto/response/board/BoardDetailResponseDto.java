@@ -1,8 +1,6 @@
 package com.example.swcompetitionproject.dto.response.board;
 
 import com.example.swcompetitionproject.entity.Board;
-import com.example.swcompetitionproject.entity.BoardCategory;
-import com.example.swcompetitionproject.entity.Category;
 import lombok.Builder;
 import lombok.Getter;
 

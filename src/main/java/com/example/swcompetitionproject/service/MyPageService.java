@@ -45,6 +45,7 @@ public class MyPageService {
                 .major(user.getMajor())
                 .studentNumber(user.getStudentNumber())
                 .build();
+
         return userResponseDto;
     }
 
@@ -78,7 +79,7 @@ public class MyPageService {
      * 유저 카테고리 삭제
      */
     public void deleteUserCategory(User user, UUID categoryId) {
-        Category category = categoryRepository.findByUserAndId(user,categoryId)
+        Category category = categoryRepository.findByUserAndId(user, categoryId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
         categoryRepository.delete(category);

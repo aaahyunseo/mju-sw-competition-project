@@ -13,7 +13,7 @@ public class ChattingRoomListDto {
     private String title;
     private int memberCount;
 
-    public static ChattingRoomListDto from(ChattingRoom room){
+    public static ChattingRoomListDto from(ChattingRoom room) {
         return ChattingRoomListDto.builder()
                 .id(room.getId())
                 .title(room.getTitle())

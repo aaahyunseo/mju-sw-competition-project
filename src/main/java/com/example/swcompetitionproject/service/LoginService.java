@@ -78,14 +78,14 @@ public class LoginService {
             //등록되어져 있다면 유저 객체 찾기
             user = userRepository.findByStudentNumber(loginDto.getId())
                     .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
-        }
-        else{
+        } else {
             //등록되어있지 않는다면 유저 등록(회원가입과 동일)
-            user=User.builder()
+            user = User.builder()
                     .studentNumber(loginDto.getId())
                     .build();
             userRepository.save(user);
         }
+
         /**
          * payload와 accessToken발급
          */
@@ -93,7 +93,6 @@ public class LoginService {
         String accessToken = jwtTokenProvider.createToken(payload);
 
         return new TokenResponseDto(accessToken);
-
 
         /**
          * 현재 사용 안하는 코드

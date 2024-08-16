@@ -13,3 +13,4 @@ public class ModifyUserNameDto {
     @NotBlank(message = "사용 할 이름을 입력해 주세요.")
     private String name;
 }
+

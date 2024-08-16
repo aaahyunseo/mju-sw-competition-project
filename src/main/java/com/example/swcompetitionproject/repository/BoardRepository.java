@@ -11,8 +11,12 @@ import java.util.UUID;
 
 public interface BoardRepository extends JpaRepository<Board, UUID> {
     List<Board> findAllByDormitoryOrderByCreatedAtDesc(DormitoryType dormitory);
+
     Optional<Board> findBoardByDormitoryAndId(DormitoryType dormitory, UUID id);
+
     Optional<Board> findBoardByDormitoryAndIdAndUser(DormitoryType dormitory, UUID id, User user);
+
     List<Board> findAllByUser(User user);
+
     int countByDormitory(DormitoryType dormitoryType);
 }
