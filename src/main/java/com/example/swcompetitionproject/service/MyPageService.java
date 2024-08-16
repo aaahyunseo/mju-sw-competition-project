@@ -3,6 +3,7 @@ package com.example.swcompetitionproject.service;
 import com.example.swcompetitionproject.dto.request.user.CreateUserCategoryDto;
 import com.example.swcompetitionproject.dto.request.user.ModifyUserNameDto;
 import com.example.swcompetitionproject.dto.response.board.MyBoardListData;
+import com.example.swcompetitionproject.dto.response.category.CategoryListData;
 import com.example.swcompetitionproject.dto.response.user.UserResponseDto;
 import com.example.swcompetitionproject.entity.Board;
 import com.example.swcompetitionproject.entity.Category;
@@ -76,10 +77,18 @@ public class MyPageService {
     /**
      * 유저 카테고리 삭제
      */
-    public void deleteUserCategory(User user, UUID categoryId){
+    public void deleteUserCategory(UUID categoryId){
         Category category=categoryRepository.findById(categoryId)
                 .orElseThrow( () -> new NotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
         categoryRepository.delete(category);
+    }
+
+    /**
+     * 유저 카테고리 전체 조회
+     */
+    public CategoryListData getUserCategoryList(User user){
+        List<Category> categories= categoryRepository.findAllByUser(user);
+        return CategoryListData.from(categories);
     }
 }
