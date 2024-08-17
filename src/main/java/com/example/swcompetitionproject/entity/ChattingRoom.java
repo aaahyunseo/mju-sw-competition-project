@@ -29,9 +29,6 @@ public class ChattingRoom extends BaseEntity {
     private Board board;
 
     @OneToMany(mappedBy = "chattingRoom", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RoomMember> roomMembers;
-
-    @OneToMany(mappedBy = "chattingRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages;
 
     @OneToMany(mappedBy = "chattingRoom", cascade = CascadeType.ALL, orphanRemoval = true)
