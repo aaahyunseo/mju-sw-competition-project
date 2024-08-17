@@ -20,9 +20,10 @@ public class BoardDetailResponseDto {
     private int current;
     private int total;
     private GenderType gender;
+    private boolean like;
     private String createdAt;
 
-    public static BoardDetailResponseDto from(Board board){
+    public static BoardDetailResponseDto of(Boolean isLike, Board board){
         return BoardDetailResponseDto.builder()
                 .id(board.getId())
                 .title(board.getTitle())
@@ -33,6 +34,7 @@ public class BoardDetailResponseDto {
                 .current(board.getChattingRoom().getMemberCount())
                 .total(board.getTotal())
                 .gender(board.getUser().getGender())
+                .like(isLike)
                 .createdAt(board.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
                 .build();
     }
