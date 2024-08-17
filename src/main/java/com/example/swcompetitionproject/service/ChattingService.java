@@ -85,6 +85,10 @@ public class ChattingService {
         if (room.getMemberCount() >= room.getBoard().getTotal()) {
             throw new UnauthorizedException(ErrorCode.ROOM_FULL);
         }
+        // 다른 성별일 경우
+        if (room.getBoard().getUser().getGender() != user.getGender()) {
+            throw new UnauthorizedException(ErrorCode.FORBIDDEN_GENDER);
+        }
 
         UserRoom userRoom = UserRoom.builder()
                 .user(user)

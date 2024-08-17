@@ -1,6 +1,7 @@
 package com.example.swcompetitionproject.dto.response.board;
 
 import com.example.swcompetitionproject.entity.Board;
+import com.example.swcompetitionproject.entity.GenderType;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -18,6 +19,7 @@ public class BoardDetailResponseDto {
     private List<String> categoryList;
     private int current;
     private int total;
+    private GenderType gender;
     private String createdAt;
 
     public static BoardDetailResponseDto from(Board board){
@@ -30,6 +32,7 @@ public class BoardDetailResponseDto {
                         .collect(Collectors.toList()))
                 .current(board.getChattingRoom().getMemberCount())
                 .total(board.getTotal())
+                .gender(board.getUser().getGender())
                 .createdAt(board.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
                 .build();
     }

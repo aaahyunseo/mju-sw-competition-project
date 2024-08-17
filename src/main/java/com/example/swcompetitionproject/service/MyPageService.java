@@ -1,15 +1,15 @@
 package com.example.swcompetitionproject.service;
 
 import com.example.swcompetitionproject.dto.request.user.CreateUserCategoryDto;
-import com.example.swcompetitionproject.dto.request.user.ModifyUserNameDto;
+import com.example.swcompetitionproject.dto.request.user.ModifyUserInfoDto;
+import com.example.swcompetitionproject.dto.request.user.UserInfoDto;
 import com.example.swcompetitionproject.dto.response.board.MyBoardListData;
 import com.example.swcompetitionproject.dto.response.category.CategoryListData;
 import com.example.swcompetitionproject.dto.response.user.UserResponseDto;
-import com.example.swcompetitionproject.entity.Board;
-import com.example.swcompetitionproject.entity.Category;
-import com.example.swcompetitionproject.entity.User;
+import com.example.swcompetitionproject.entity.*;
 import com.example.swcompetitionproject.exception.ErrorCode;
 import com.example.swcompetitionproject.exception.NotFoundException;
+import com.example.swcompetitionproject.exception.UnauthorizedException;
 import com.example.swcompetitionproject.repository.BoardRepository;
 import com.example.swcompetitionproject.repository.CategoryRepository;
 import com.example.swcompetitionproject.repository.UserRepository;
@@ -28,11 +28,20 @@ public class MyPageService {
     private final CategoryRepository categoryRepository;
 
     /**
-     * 유저 이름 변경
+     * 유저 정보 등록
      */
-    public void modifyUserName(User user, ModifyUserNameDto modifyUserNameDto) {
+    public void userInfoSave(User user, UserInfoDto userInfoDto) {
+        GenderType genderType = genderValidate(userInfoDto.getGender());
+        //유저의 이름과 성별 필수
+        user.setName(userInfoDto.getName()).setGender(genderType);
+        userRepository.save(user);
+    }
+    /**
+     * 유저 정보 변경
+     */
+    public void modifyUserInfo(User user, ModifyUserInfoDto modifyUserInfoDto) {
         //유저의 이름만 변경
-        user.setName(modifyUserNameDto.getName());
+        user.setName(modifyUserInfoDto.getName());
         userRepository.save(user);
     }
 
@@ -44,6 +53,7 @@ public class MyPageService {
                 .name(user.getName())
                 .major(user.getMajor())
                 .studentNumber(user.getStudentNumber())
+                .gender(user.getGender())
                 .build();
 
         return userResponseDto;
@@ -65,7 +75,7 @@ public class MyPageService {
     /**
      * 유저 카테고리 추가
      */
-    public void creatUserCatedory(User user, CreateUserCategoryDto createUserCategoryDto) {
+    public void creatUserCategory(User user, CreateUserCategoryDto createUserCategoryDto) {
 
         Category newCategory = Category.builder()
                 .category(createUserCategoryDto.getCategory())
@@ -91,5 +101,17 @@ public class MyPageService {
     public CategoryListData getUserCategoryList(User user) {
         List<Category> categories = categoryRepository.findAllByUser(user);
         return CategoryListData.from(categories);
+    }
+
+    /**
+     * 성별 타입 검증 로직
+     **/
+    public GenderType genderValidate(String gender) {
+        for (GenderType type : GenderType.values()) {
+            if (type.name().equals(gender.toUpperCase())) {
+                return type;
+            }
+        }
+        throw new UnauthorizedException(ErrorCode.INVALID_GENDER);
     }
 }

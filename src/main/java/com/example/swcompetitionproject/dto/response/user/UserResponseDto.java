@@ -1,5 +1,6 @@
 package com.example.swcompetitionproject.dto.response.user;
 
+import com.example.swcompetitionproject.entity.GenderType;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,4 +15,7 @@ public class UserResponseDto {
 
     //학번
     private String studentNumber;
+
+    //성별
+    private GenderType gender;
 }
