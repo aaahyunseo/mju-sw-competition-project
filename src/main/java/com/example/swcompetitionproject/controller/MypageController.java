@@ -65,7 +65,7 @@ public class MypageController {
      */
     @PostMapping("/category")
     public ResponseEntity<ResponseDto<Void>> creatUserCategory(@AuthenticatedUser User user, @RequestBody CreateUserCategoryDto createUserCategoryDto) {
-        myPageService.creatUserCatedory(user, createUserCategoryDto);
+        myPageService.creatUserCategory(user, createUserCategoryDto);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "유저 카테고리 추가 완료", null), HttpStatus.OK);
     }
 

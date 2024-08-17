@@ -75,7 +75,7 @@ public class MyPageService {
     /**
      * 유저 카테고리 추가
      */
-    public void creatUserCatedory(User user, CreateUserCategoryDto createUserCategoryDto) {
+    public void creatUserCategory(User user, CreateUserCategoryDto createUserCategoryDto) {
 
         Category newCategory = Category.builder()
                 .category(createUserCategoryDto.getCategory())
