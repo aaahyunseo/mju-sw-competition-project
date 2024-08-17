@@ -11,9 +11,11 @@ public enum ErrorCode {
 
     //UnauthorizedException
     INVALID_TOKEN("4010", "유효하지 않은 토큰입니다."),
-    INVALID_DORMITORY("4042", "유효하지 않은 기숙사입니다."),
+    INVALID_DORMITORY("4012", "유효하지 않은 기숙사입니다."),
+    ROOM_FULL("4013","채팅방 인원이 가득찼습니다."),
 
     //ForbiddenException
+    NO_ACCESS("4030", "접근 권한이 없습니다."),
 
     //NotFoundException
     COOKIE_NOT_FOUND("4040", "쿠키를 찾을 수 없습니다."),
