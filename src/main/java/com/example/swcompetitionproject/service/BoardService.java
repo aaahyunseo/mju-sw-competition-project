@@ -30,10 +30,10 @@ public class BoardService {
      * 게시글 전체 조회
      **/
     @Transactional
-    public BoardListData getBoardList(String dormitory) {
+    public BoardListData getBoardList(User user, String dormitory) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
         List<Board> boards = boardRepository.findAllByDormitoryOrderByCreatedAtDesc(dormitoryType);
-        return BoardListData.from(boards);
+        return BoardListData.of(boards, user, interestRepository);
     }
 
     /**
