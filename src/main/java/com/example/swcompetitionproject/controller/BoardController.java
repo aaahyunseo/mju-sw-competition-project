@@ -24,14 +24,14 @@ public class BoardController {
 
     //게시글 전체 조회
     @GetMapping
-    public ResponseEntity<ResponseDto<BoardListData>> getBoardList(@RequestParam(value = "dormitory") String dormitory) {
+    public ResponseEntity<ResponseDto<BoardListData>> getBoardList(@AuthenticatedUser User user, @RequestParam(value = "dormitory") String dormitory) {
         BoardListData boardListData = boardService.getBoardList(dormitory);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 목록 조회 완료", boardListData), HttpStatus.OK);
     }
 
     //게시글 상세 조회
     @GetMapping("/{boardId}")
-    public ResponseEntity<ResponseDto<BoardData>> getBoardById(@RequestParam(value = "dormitory") String dormitory, @PathVariable UUID boardId) {
+    public ResponseEntity<ResponseDto<BoardData>> getBoardById(@AuthenticatedUser User user, @RequestParam(value = "dormitory") String dormitory, @PathVariable UUID boardId) {
         BoardData boardDto = boardService.getBoardById(dormitory, boardId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 조회 완료", boardDto), HttpStatus.OK);
     }
