@@ -2,7 +2,8 @@ package com.example.swcompetitionproject.controller;
 
 import com.example.swcompetitionproject.authentication.AuthenticatedUser;
 import com.example.swcompetitionproject.dto.request.user.CreateUserCategoryDto;
-import com.example.swcompetitionproject.dto.request.user.ModifyUserNameDto;
+import com.example.swcompetitionproject.dto.request.user.ModifyUserInfoDto;
+import com.example.swcompetitionproject.dto.request.user.UserInfoDto;
 import com.example.swcompetitionproject.dto.response.ResponseDto;
 import com.example.swcompetitionproject.dto.response.board.MyBoardListData;
 import com.example.swcompetitionproject.dto.response.category.CategoryListData;
@@ -24,12 +25,21 @@ public class MypageController {
     private final MyPageService myPageService;
 
     /**
-     * 유저 이름 변경
+     * 유저 정보 등록
      */
-    @PatchMapping("info/name")
-    public ResponseEntity<ResponseDto<Void>> modifyUserName(@AuthenticatedUser User user, @Valid @RequestBody ModifyUserNameDto modifyUserNameDto) {
-        myPageService.modifyUserName(user, modifyUserNameDto);
-        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "이름 수정 완료"), HttpStatus.OK);
+    @PostMapping("info")
+    public ResponseEntity<ResponseDto<Void>> userInfoSave(@AuthenticatedUser User user, @Valid @RequestBody UserInfoDto userInfoDto) {
+        myPageService.userInfoSave(user, userInfoDto);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "사용자 이름과 성별 정보 저장 완료"), HttpStatus.OK);
+    }
+
+    /**
+     * 유저 정보 변경
+     */
+    @PatchMapping("info")
+    public ResponseEntity<ResponseDto<Void>> modifyUserInfo(@AuthenticatedUser User user, @Valid @RequestBody ModifyUserInfoDto modifyUserInfoDto) {
+        myPageService.modifyUserInfo(user, modifyUserInfoDto);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "사용자 정보 수정 완료"), HttpStatus.OK);
     }
 
     /**
