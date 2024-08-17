@@ -25,7 +25,7 @@ public class BoardController {
     //게시글 전체 조회
     @GetMapping
     public ResponseEntity<ResponseDto<BoardListData>> getBoardList(@AuthenticatedUser User user, @RequestParam(value = "dormitory") String dormitory) {
-        BoardListData boardListData = boardService.getBoardList(dormitory);
+        BoardListData boardListData = boardService.getBoardList(user, dormitory);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 목록 조회 완료", boardListData), HttpStatus.OK);
     }
 
