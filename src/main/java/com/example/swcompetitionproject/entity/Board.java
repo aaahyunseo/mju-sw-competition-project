@@ -40,6 +40,9 @@ public class Board extends BaseEntity {
     @Setter
     private List<BoardCategory> boardCategories;
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Interest> interests;
+
     public Board setContent(String content){
         this.content = content;
         return this;
