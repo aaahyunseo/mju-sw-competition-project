@@ -27,6 +27,10 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String studentNumber;
 
+    //성별
+    @Enumerated(EnumType.STRING)
+    private GenderType gender;
+
     //카테고리
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Category> category;
@@ -36,4 +40,13 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserRoom> userRooms;
+
+    public User setName(String name){
+        this.name = name;
+        return this;
+    }
+    public User setGender(GenderType gender){
+        this.gender = gender;
+        return this;
+    }
 }
