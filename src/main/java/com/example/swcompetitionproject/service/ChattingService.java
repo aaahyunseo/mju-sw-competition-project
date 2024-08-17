@@ -5,6 +5,7 @@ import com.example.swcompetitionproject.dto.response.chatting.ChattingRoomListDa
 import com.example.swcompetitionproject.entity.*;
 import com.example.swcompetitionproject.exception.ErrorCode;
 import com.example.swcompetitionproject.exception.NotFoundException;
+import com.example.swcompetitionproject.exception.UnauthorizedException;
 import com.example.swcompetitionproject.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,10 +21,11 @@ public class ChattingService {
 
     private final ChattingRoomRepository chattingRoomRepository;
     private final MessageRepository messageRepository;
-    private final RoomMemberRepository roomMemberRepository;
     private final UserRoomRepository userRoomRepository;
 
-    //채팅방 목록 조회
+    /**
+     * 채팅방 목록 조회
+     **/
     @Transactional
     public ChattingRoomListData getRoomList(User user) {
         List<ChattingRoom> rooms = userRoomRepository.findByUser(user).stream()
@@ -33,12 +35,14 @@ public class ChattingService {
         return ChattingRoomListData.from(rooms);
     }
 
-    //채팅방 생성하기 - 게시글 생성 시 채팅방 생성
+    /**
+     * 채팅방 생성하기 - 게시글 작성 시에 채팅방 생성
+     **/
     @Transactional
     public ChattingRoom createRoom(User user, Board board) {
         ChattingRoom room = ChattingRoom.builder()
                 .title(board.getTitle())
-                .manager(user.getStudentNumber())
+                .manager(user.getName())
                 .memberCount(1)
                 .board(board)
                 .build();
@@ -52,55 +56,87 @@ public class ChattingService {
         return chattingRoomRepository.save(room);
     }
 
-    //채팅 메시지 저장
+    /**
+     * 채팅 메세지 저장하기
+     **/
     @Transactional
-    public Message saveMessage(User user, UUID roomId, ChatMessageDto message) {
-        ChattingRoom room = chattingRoomRepository.findById(roomId)
+    public Message saveMessage(ChatMessageDto message) {
+        ChattingRoom room = chattingRoomRepository.findById(message.getRoomId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
 
         Message newMessage = Message.builder()
                 .content(message.getContent())
-                .sender(user.getStudentNumber())
+                .sender(message.getSender())
                 .chattingRoom(room)
                 .build();
 
         return messageRepository.save(newMessage);
     }
 
-    //사용자를 채팅방에 추가
+    /**
+     * 채팅방에 사용자 추가하기
+     **/
     @Transactional
     public void addUserToRoom(User user, UUID roomId) {
         ChattingRoom room = chattingRoomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
 
-        RoomMember member = RoomMember.builder()
-                .name(user.getStudentNumber())
+        // 채팅방의 현재 인원 수와 최대 인원 수 비교
+        if (room.getMemberCount() >= room.getBoard().getTotal()) {
+            throw new UnauthorizedException(ErrorCode.ROOM_FULL);
+        }
+
+        UserRoom userRoom = UserRoom.builder()
+                .user(user)
                 .chattingRoom(room)
                 .build();
-        roomMemberRepository.save(member);
+        userRoomRepository.save(userRoom);
 
         room.setMemberCount(room.getMemberCount() + 1);
         chattingRoomRepository.save(room);
     }
 
-    // 채팅방 퇴장하기
+    /**
+     * 채팅방 퇴장하기
+     **/
     @Transactional
     public void removeUserFromRoom(User user, UUID roomId) {
         ChattingRoom room = chattingRoomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
 
-        RoomMember member = roomMemberRepository.findByNameAndChattingRoom(user.getStudentNumber(), room)
+        UserRoom userRoom = userRoomRepository.findByUserAndChattingRoom(user, room)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
-
-        roomMemberRepository.delete(member);
+        userRoomRepository.delete(userRoom);
 
         room.setMemberCount(room.getMemberCount() - 1);
         chattingRoomRepository.save(room);
     }
 
-    // 채팅방 삭제하기
+    /**
+     * 채팅방 삭제하기
+     **/
     public void deleteRoom(Board board) {
         chattingRoomRepository.deleteByBoard(board);
     }
-}
 
+    /**
+     * 기존 메시지 조회 및 반환
+     **/
+    @Transactional
+    public List<Message> getMessagesByRoomId(UUID roomId) {
+        ChattingRoom room = chattingRoomRepository.findById(roomId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
+        return messageRepository.findByChattingRoomOrderByCreatedAtAsc(room);
+    }
+
+    /**
+     * 채팅방에 처음 입장한 유저인지 확인
+     **/
+    @Transactional
+    public boolean isNewUserInRoom(User user, UUID roomId) {
+        ChattingRoom chattingRoom = chattingRoomRepository.findById(roomId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
+
+        return !userRoomRepository.existsByUserAndChattingRoom(user, chattingRoom);
+    }
+}
