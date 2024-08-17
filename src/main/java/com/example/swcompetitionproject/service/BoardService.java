@@ -9,11 +9,13 @@ import com.example.swcompetitionproject.entity.BoardCategory;
 import com.example.swcompetitionproject.entity.DormitoryType;
 import com.example.swcompetitionproject.entity.User;
 import com.example.swcompetitionproject.exception.ErrorCode;
+import com.example.swcompetitionproject.exception.ForbiddenException;
 import com.example.swcompetitionproject.exception.NotFoundException;
 import com.example.swcompetitionproject.exception.UnauthorizedException;
 import com.example.swcompetitionproject.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +30,7 @@ public class BoardService {
     /**
      * 게시글 전체 조회
      **/
+    @Transactional
     public BoardListData getBoardList(String dormitory) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
         List<Board> boards = boardRepository.findAllByDormitoryOrderByCreatedAtDesc(dormitoryType);
@@ -37,6 +40,7 @@ public class BoardService {
     /**
      * 게시글 상세 조회
      **/
+    @Transactional
     public BoardData getBoardById(String dormitory, UUID boardId) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
         Board board = boardRepository.findBoardByDormitoryAndId(dormitoryType, boardId)
@@ -47,6 +51,7 @@ public class BoardService {
     /**
      * 게시글 작성
      **/
+    @Transactional
     public void createBoard(String dormitory, CreateBoardDto createBoardDto, User user) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
 
@@ -90,6 +95,7 @@ public class BoardService {
     /**
      * 게시글 수정
      **/
+    @Transactional
     public void updateBoard(String dormitory, UUID boardId, UpdateBoardDto updateBoardDto, User user) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
         Board updateBoard = boardValidate(dormitoryType, boardId, user);
@@ -100,6 +106,7 @@ public class BoardService {
     /**
      * 게시글 삭제
      **/
+    @Transactional
     public void deleteBoard(String dormitory, UUID boardId, User user) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
         Board board = boardValidate(dormitoryType, boardId, user);
@@ -108,11 +115,11 @@ public class BoardService {
     }
 
     /**
-     * 게시글 존재 여부 확인 로직
+     * 접근 유저의 게시글 권한 확인
      **/
     public Board boardValidate(DormitoryType dormitoryType, UUID boardId, User user) {
         return boardRepository.findBoardByDormitoryAndIdAndUser(dormitoryType, boardId, user)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.BOARD_NOT_FOUND));
+                .orElseThrow(() -> new ForbiddenException(ErrorCode.NO_ACCESS));
     }
 
     /**
