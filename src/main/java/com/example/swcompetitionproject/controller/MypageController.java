@@ -27,7 +27,7 @@ public class MypageController {
     /**
      * 유저 정보 등록
      */
-    @PostMapping("info")
+    @PostMapping("/info")
     public ResponseEntity<ResponseDto<Void>> userInfoSave(@AuthenticatedUser User user, @Valid @RequestBody UserInfoDto userInfoDto) {
         myPageService.userInfoSave(user, userInfoDto);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "사용자 이름과 성별 정보 저장 완료"), HttpStatus.OK);
@@ -36,7 +36,7 @@ public class MypageController {
     /**
      * 유저 정보 변경
      */
-    @PatchMapping("info")
+    @PatchMapping("/info")
     public ResponseEntity<ResponseDto<Void>> modifyUserInfo(@AuthenticatedUser User user, @Valid @RequestBody ModifyUserInfoDto modifyUserInfoDto) {
         myPageService.modifyUserInfo(user, modifyUserInfoDto);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "사용자 정보 수정 완료"), HttpStatus.OK);
