@@ -1,4 +1,4 @@
-package com.example.swcompetitionproject.dto.response.auth;
+package com.example.swcompetitionproject.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -4,7 +4,7 @@ import com.example.swcompetitionproject.authentication.AuthenticatedUser;
 import com.example.swcompetitionproject.dto.request.user.CreateUserCategoryDto;
 import com.example.swcompetitionproject.dto.request.user.ModifyUserInfoDto;
 import com.example.swcompetitionproject.dto.request.user.UserInfoDto;
-import com.example.swcompetitionproject.dto.response.auth.ResponseDto;
+import com.example.swcompetitionproject.dto.response.ResponseDto;
 import com.example.swcompetitionproject.dto.response.board.MyBoardListData;
 import com.example.swcompetitionproject.dto.response.category.CategoryListData;
 import com.example.swcompetitionproject.dto.response.user.UserResponseDto;

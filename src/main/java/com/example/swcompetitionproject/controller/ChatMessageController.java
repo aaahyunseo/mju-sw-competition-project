@@ -3,7 +3,7 @@ package com.example.swcompetitionproject.controller;
 import com.example.swcompetitionproject.authentication.AuthenticatedUser;
 import com.example.swcompetitionproject.dto.request.board.RoomIdDto;
 import com.example.swcompetitionproject.dto.request.chatting.ChatMessageDto;
-import com.example.swcompetitionproject.dto.response.auth.ResponseDto;
+import com.example.swcompetitionproject.dto.response.ResponseDto;
 import com.example.swcompetitionproject.dto.response.chatting.ChattingRoomListData;
 import com.example.swcompetitionproject.entity.Message;
 import com.example.swcompetitionproject.entity.User;
