@@ -48,24 +48,24 @@ public class ChatMessageController {
     }
 
     /**
-     * 다른 유저의 채팅방 추가하기
+     * 다른 유저의 채팅방 입장하기
      **/
     @PostMapping("/chat")
     public ResponseEntity<ResponseDto<Void>> getRoomList(@AuthenticatedUser User user, @Valid @RequestBody RoomIdDto roomIdDto) {
-        chattingService.addUserToRoom(user, roomIdDto);
         boolean isNewUser = chattingService.isNewUserInRoom(user, roomIdDto.getRoomId());
-
         // 만약 새로운 유저라면, 채팅방 입장 메시지 전송
         if (isNewUser) {
+            chattingService.addUserToRoom(user, roomIdDto.getRoomId());
             ChatMessageDto enterMessageDto = ChatMessageDto.builder()
                     .roomId(roomIdDto.getRoomId())
-                    .content(user.getName() + "님이 채팅방에 추가되었습니다.")
+                    .content(user.getName() + "님이 채팅방에 입장하였습니다.")
                     .sender(user.getName())
                     .timestamp(LocalDateTime.now())
                     .build();
             template.convertAndSend("/sub/ws/chat/room/" + roomIdDto.getRoomId(), enterMessageDto);
+            chattingService.saveMessage(enterMessageDto);
         }
-        return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "채팅방 추가 완료"), HttpStatus.CREATED);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "다른 유저 채팅방 입장 완료"), HttpStatus.CREATED);
     }
 
     /**
@@ -102,10 +102,11 @@ public class ChatMessageController {
      * 채팅방 퇴장하기
      **/
     @MessageMapping("/ws/chat/{roomId}/quit")
-    public void quit(@DestinationVariable UUID roomId, @AuthenticatedUser User user) {
+    public void quit(@DestinationVariable UUID roomId, @AuthenticatedUser User user, @Payload ChatMessageDto message) {
         // 사용자를 채팅방에서 제거
-        chattingService.removeUserFromRoom(user, roomId);
+        chattingService.removeUserFromRoom(user, message.getRoomId());
 
+        log.info("퇴장 완료");
         // 퇴장 메시지 생성 및 타임스탬프 설정
         ChatMessageDto quitMessage = ChatMessageDto.builder()
                 .roomId(roomId)
@@ -113,6 +114,7 @@ public class ChatMessageController {
                 .sender(user.getName())
                 .timestamp(LocalDateTime.now()) // 현재 시간을 타임스탬프로 설정
                 .build();
-        template.convertAndSend("/sub/ws/chat/room/" + roomId, quitMessage);
+        template.convertAndSend("/sub/ws/chat/room/" + message.getRoomId(), quitMessage);
+        log.info("퇴장 메세지 전송 완료");
     }
 }
