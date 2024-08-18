@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 @Builder
 public class ChattingRoomListData {
     private List<ChattingRoomListDto> chattingRoomList;
+    private int roomCount;
 
     public static ChattingRoomListData from(List<ChattingRoom> chattingRooms) {
         return ChattingRoomListData.builder()
@@ -18,6 +19,7 @@ public class ChattingRoomListData {
                         chattingRooms.stream()
                                 .map(ChattingRoomListDto::from)
                                 .collect(Collectors.toList()))
+                .roomCount(chattingRooms.size())
                 .build();
     }
 }
