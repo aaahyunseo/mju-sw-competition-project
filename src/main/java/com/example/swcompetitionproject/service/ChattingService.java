@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,6 +34,7 @@ public class ChattingService {
     public ChattingRoomListData getRoomList(User user) {
         List<ChattingRoom> rooms = userRoomRepository.findByUser(user).stream()
                 .map(UserRoom::getChattingRoom)
+                .sorted(Comparator.comparing(ChattingRoom::getCreatedAt).reversed())
                 .collect(Collectors.toList());
 
         return ChattingRoomListData.from(rooms);
