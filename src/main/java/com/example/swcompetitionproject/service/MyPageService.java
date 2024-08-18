@@ -64,7 +64,7 @@ public class MyPageService {
      */
     public MyBoardListData getMyBoard(User user) {
         //내가 작성한 모든 게시판 찾기
-        List<Board> myBoards = boardRepository.findAllByUser(user);
+        List<Board> myBoards = boardRepository.findAllByUserOrderByCreatedAtAsc(user);
 
         //데이터 리스트로 만들기
         MyBoardListData myBoardListData = MyBoardListData.from(myBoards);
@@ -99,7 +99,7 @@ public class MyPageService {
      * 유저 카테고리 전체 조회
      */
     public CategoryListData getUserCategoryList(User user) {
-        List<Category> categories = categoryRepository.findAllByUser(user);
+        List<Category> categories = categoryRepository.findAllByUserOrderByCreatedAtDesc(user);
         return CategoryListData.from(categories);
     }
 
