@@ -1,5 +1,6 @@
 package com.example.swcompetitionproject.service;
 
+import com.example.swcompetitionproject.dto.request.board.RoomIdDto;
 import com.example.swcompetitionproject.dto.request.chatting.ChatMessageDto;
 import com.example.swcompetitionproject.dto.response.chatting.ChattingRoomListData;
 import com.example.swcompetitionproject.entity.*;
@@ -8,6 +9,7 @@ import com.example.swcompetitionproject.exception.NotFoundException;
 import com.example.swcompetitionproject.exception.UnauthorizedException;
 import com.example.swcompetitionproject.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChattingService {
@@ -77,9 +80,15 @@ public class ChattingService {
      * 채팅방에 사용자 추가하기
      **/
     @Transactional
-    public void addUserToRoom(User user, UUID roomId) {
-        ChattingRoom room = chattingRoomRepository.findById(roomId)
+    public void addUserToRoom(User user, RoomIdDto roomIdDto) {
+        ChattingRoom room = chattingRoomRepository.findById(roomIdDto.getRoomId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
+
+        // 유저가 이미 채팅방에 있는지 확인
+        boolean isUserInRoom = userRoomRepository.existsByUserAndChattingRoom(user, room);
+        if (isUserInRoom) {
+            throw new UnauthorizedException(ErrorCode.USER_ALREADY_IN_ROOM);
+        }
 
         // 채팅방의 현재 인원 수와 최대 인원 수 비교
         if (room.getMemberCount() >= room.getBoard().getTotal()) {
@@ -119,6 +128,7 @@ public class ChattingService {
     /**
      * 채팅방 삭제하기
      **/
+    @Transactional
     public void deleteRoom(Board board) {
         chattingRoomRepository.deleteByBoard(board);
     }
@@ -130,6 +140,8 @@ public class ChattingService {
     public List<Message> getMessagesByRoomId(UUID roomId) {
         ChattingRoom room = chattingRoomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
+        List<Message> messages = messageRepository.findByChattingRoomOrderByCreatedAtAsc(room);
+        log.info("기존 메세지 조회 service: {} messages from room {}", messages.size(), roomId);
         return messageRepository.findByChattingRoomOrderByCreatedAtAsc(room);
     }
 
