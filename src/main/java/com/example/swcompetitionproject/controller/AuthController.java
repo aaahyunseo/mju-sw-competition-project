@@ -1,11 +1,14 @@
 package com.example.swcompetitionproject.controller;
 
+import com.example.swcompetitionproject.authentication.AuthenticatedUser;
 import com.example.swcompetitionproject.authentication.AuthenticationExtractor;
 import com.example.swcompetitionproject.authentication.JwtEncoder;
 import com.example.swcompetitionproject.dto.request.auth.LoginDto;
 import com.example.swcompetitionproject.dto.response.auth.LoginResponseDto;
 import com.example.swcompetitionproject.dto.response.ResponseDto;
 import com.example.swcompetitionproject.dto.response.auth.TokenResponseDto;
+import com.example.swcompetitionproject.dto.response.TokenResponseDto;
+import com.example.swcompetitionproject.entity.User;
 import com.example.swcompetitionproject.service.LoginService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -48,7 +51,7 @@ public class AuthController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<ResponseDto<Void>> logout(final HttpServletResponse response) {
+    public ResponseEntity<ResponseDto<Void>> logout(@AuthenticatedUser User user, final HttpServletResponse response) {
 
         ResponseCookie cookie = ResponseCookie.from(AuthenticationExtractor.TOKEN_COOKIE_NAME, null)
                 .maxAge(Duration.ofMillis(0))
