@@ -1,6 +1,5 @@
 package com.example.swcompetitionproject.service;
 
-import com.example.swcompetitionproject.dto.request.board.RoomIdDto;
 import com.example.swcompetitionproject.dto.request.chatting.ChatMessageDto;
 import com.example.swcompetitionproject.dto.response.chatting.ChattingRoomListData;
 import com.example.swcompetitionproject.entity.*;
@@ -82,8 +81,8 @@ public class ChattingService {
      * 채팅방에 사용자 추가하기
      **/
     @Transactional
-    public void addUserToRoom(User user, RoomIdDto roomIdDto) {
-        ChattingRoom room = chattingRoomRepository.findById(roomIdDto.getRoomId())
+    public void addUserToRoom(User user, UUID roomId) {
+        ChattingRoom room = chattingRoomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
 
         // 유저가 이미 채팅방에 있는지 확인
@@ -91,7 +90,6 @@ public class ChattingService {
         if (isUserInRoom) {
             throw new UnauthorizedException(ErrorCode.USER_ALREADY_IN_ROOM);
         }
-
         // 채팅방의 현재 인원 수와 최대 인원 수 비교
         if (room.getMemberCount() >= room.getBoard().getTotal()) {
             throw new UnauthorizedException(ErrorCode.ROOM_FULL);
