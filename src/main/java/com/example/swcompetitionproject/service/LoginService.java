@@ -15,6 +15,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -24,12 +26,16 @@ public class LoginService {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-
-    private static final String USER_CHECK_URL = "https://sso1.mju.ac.kr/mju/userCheck.do";
-    private static final String LOGIN_URL = "https://sso1.mju.ac.kr/login/ajaxActionLogin2.do";
     private final UserRepository userRepository;
-    //private static final String TOKEN_URL = "https://sso1.mju.ac.kr/oauth2/token2.do";
-    //private static final String LOGIN_BANDI_URL = "https://lms.mju.ac.kr/ilos/lo/login_bandi_sso.acl";
+
+
+    private static final String USER_CHECK_URL = "https://sso1.mju.ac.kr/mju/userCheck.do"; //유저체크 URL
+    private static final String LOGIN_URL = "https://sso1.mju.ac.kr/login/ajaxActionLogin2.do";
+    private static final String TOKEN_URL = "https://sso1.mju.ac.kr/oauth2/token2.do";
+    private static final String LOGIN_BANDI_URL = "https://lms.mju.ac.kr/ilos/lo/login_bandi_sso.acl";
+
+    private static final String TEST="https://search.naver.com/search.naver?where=news&sm=tab_jum&query=뉴스";
+
 
     public TokenResponseDto login(LoginDto loginDto) {
         log.info("Starting login process for user: {}", loginDto.getId());
@@ -67,6 +73,7 @@ public class LoginService {
         String loginRespons = loginResponseEntity.getBody();
         HttpHeaders headersss = loginResponseEntity.getHeaders();
 
+        //결과 확인
         log.info("loginResponseEntity: {}", loginResponseEntity);
         log.info("HTTP Status Code: {}", statusCode);
         log.info("login response: {}", loginRespons);
@@ -86,13 +93,10 @@ public class LoginService {
             userRepository.save(user);
         }
 
-        /**
-         * payload와 accessToken발급
-         */
-        String payload = String.valueOf(user.getId());
-        String accessToken = jwtTokenProvider.createToken(payload);
 
-        return new TokenResponseDto(accessToken);
+        //var login =restTemplate.getForObject(TEST,String.class);
+        //log.info(login);
+
 
         /**
          * 현재 사용 안하는 코드
@@ -101,25 +105,37 @@ public class LoginService {
         //String tokenResponse = restTemplate.postForObject(TOKEN_URL, requestEntity, String.class);
         //log.info("tokenResponse: {}", tokenResponse);
 
-
-        // 첫 번째 요청에서 받은 리다이렉션 URL을 가져와 다시 요청을 보냄->이미 주소를 알고있기 때문에 주석처리
-        //HttpHeaders responseHeaders = restTemplate.postForEntity(TOKEN_URL, requestEntity, String.class).getHeaders();
-        //String redirectUrl = responseHeaders.getLocation().toString(); // 리다이렉션 URL 가져오기
+        //첫 번째 요청에서 받은 리다이렉션 URL을 가져와 다시 요청을 보냄->이미 주소를 알고있기 때문에 주석처리
+        HttpHeaders responseHeaders = restTemplate.postForEntity(TOKEN_URL, requestEntity, String.class).getHeaders();
+        log.info("responseHeaders: {}", responseHeaders);
+        String redirectUrl = responseHeaders.getLocation().toString(); // 리다이렉션 URL 가져오기
+        log.info("redirectUrl: {}",redirectUrl);
 
         //// 쿠키를 가져와 로깅 또는 수동으로 처리
-        //ResponseEntity<String> responseEntity = restTemplate.getForEntity(redirectUrl, String.class);
-        //HttpHeaders headersCookies = responseEntity.getHeaders();
-        //List<String> cookies = headersCookies.get(HttpHeaders.SET_COOKIE);
-        //if (cookies != null) {
-        //    for (String cookie : cookies) {
-        //        log.info("Received Cookie: {}", cookie);
-        //        // 필요 시 쿠키를 수동으로 추가할 수 있음
-        //    }
-        //}
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(redirectUrl,requestEntity, String.class);
+        HttpHeaders headersCookies = responseEntity.getHeaders();
+        log.info("responseEntity: {}", responseEntity);
+
+        //여기사부터 쿠키가 없다고 나옴
+        List<String> cookies = headersCookies.get(HttpHeaders.SET_COOKIE);
+        if (cookies != null) {
+            for (String cookie : cookies) {
+                log.info("JSESSIONID: {}", cookie);
+                // 필요 시 쿠키를 수동으로 추가할 수 있음
+            }
+        }
 
         // 리다이렉션된 URL로 재요청
-        //String redirecTtokenResponse = restTemplate.postForObject(LOGIN_BANDI_URL, requestEntity, String.class);
-        //log.info("tokenResponse after redirection: {}", redirecTtokenResponse);
+        String redirecTtokenResponse = restTemplate.postForObject(LOGIN_BANDI_URL, requestEntity, String.class);
+        log.info("tokenResponse after redirection: {}", redirecTtokenResponse);
 
+
+        /**
+         * payload와 accessToken발급
+         */
+        String payload = String.valueOf(user.getId());
+        String accessToken = jwtTokenProvider.createToken(payload);
+
+        return new TokenResponseDto(accessToken);
     }
 }

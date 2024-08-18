@@ -7,6 +7,7 @@ import com.example.swcompetitionproject.dto.response.LoginResponseDto;
 import com.example.swcompetitionproject.dto.response.ResponseDto;
 import com.example.swcompetitionproject.dto.response.TokenResponseDto;
 import com.example.swcompetitionproject.service.LoginService;
+import com.example.swcompetitionproject.service.TestLoginService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
+import java.util.Map;
 
 @Slf4j
 @AllArgsConstructor
@@ -25,6 +27,7 @@ import java.time.Duration;
 public class AuthController {
 
     private final LoginService loginService;
+    private final TestLoginService testLoginService;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto<Void>> login(@RequestBody @Valid LoginDto loginDto, HttpServletResponse response) {
@@ -45,6 +48,25 @@ public class AuthController {
 
             return new ResponseEntity<>(LoginResponseDto.loginres(HttpStatus.UNAUTHORIZED, "학교 계정으로 로그인 실패", null), HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    @PostMapping("/testlogin")
+    public  ResponseEntity<ResponseDto<Void>> testlogin(@RequestBody @Valid LoginDto loginDto,HttpServletResponse response){
+        try {
+            String loginResult = testLoginService.login(loginDto);
+            response.addHeader("set-cookie",loginResult);
+
+            return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "학교 계정으로 로그인 완료"), HttpStatus.OK);
+        } catch (Exception e) {
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "학교 계정으로 로그인 실패"), HttpStatus.UNAUTHORIZED);
+
+        }
+    }
+
+    @GetMapping("/tsetsubject")
+    public ResponseEntity<ResponseDto<Void>> tsetsubject(){
+
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "로그 아웃 완료"), HttpStatus.OK);
     }
 
     @GetMapping("/logout")
