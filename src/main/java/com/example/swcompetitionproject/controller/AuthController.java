@@ -50,7 +50,7 @@ public class AuthController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<ResponseDto<Void>> logout(final HttpServletResponse response) {
+    public ResponseEntity<ResponseDto<Void>> logout(@AuthenticatedUser User user, final HttpServletResponse response) {
 
         ResponseCookie cookie = ResponseCookie.from(AuthenticationExtractor.TOKEN_COOKIE_NAME, null)
                 .maxAge(Duration.ofMillis(0))
