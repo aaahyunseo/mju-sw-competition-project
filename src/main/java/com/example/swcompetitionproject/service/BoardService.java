@@ -40,11 +40,12 @@ public class BoardService {
      * 게시글 상세 조회
      **/
     @Transactional
-    public BoardData getBoardById(String dormitory, UUID boardId) {
+    public BoardData getBoardById(User user, String dormitory, UUID boardId) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
         Board board = boardRepository.findBoardByDormitoryAndId(dormitoryType, boardId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.BOARD_NOT_FOUND));
-        return BoardData.from(board);
+        boolean isLike = interestRepository.existsByUserAndBoard(user, board);
+        return BoardData.of(isLike, board);
     }
 
     /**
