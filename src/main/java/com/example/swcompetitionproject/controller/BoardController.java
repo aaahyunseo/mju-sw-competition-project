@@ -32,7 +32,7 @@ public class BoardController {
     //게시글 상세 조회
     @GetMapping("/{boardId}")
     public ResponseEntity<ResponseDto<BoardData>> getBoardById(@AuthenticatedUser User user, @RequestParam(value = "dormitory") String dormitory, @PathVariable UUID boardId) {
-        BoardData boardDto = boardService.getBoardById(user,dormitory, boardId);
+        BoardData boardDto = boardService.getBoardById(user, dormitory, boardId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 조회 완료", boardDto), HttpStatus.OK);
     }
 

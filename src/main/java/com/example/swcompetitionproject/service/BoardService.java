@@ -45,6 +45,10 @@ public class BoardService {
         Board board = boardRepository.findBoardByDormitoryAndId(dormitoryType, boardId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.BOARD_NOT_FOUND));
 
+        boolean isLike = interestRepository.existsByUserAndBoard(user, board);
+        return BoardData.of(isLike, board);
+
+
         // 기존의 BoardCategories를 가져와서 처리
         List<BoardCategory> existingCategories = board.getBoardCategories();
 
@@ -62,6 +66,7 @@ public class BoardService {
         existingCategories.addAll(boardCategories);
 
         return BoardData.from(board);
+
     }
 
     /**

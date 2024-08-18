@@ -8,13 +8,16 @@ import com.example.swcompetitionproject.exception.NotFoundException;
 import com.example.swcompetitionproject.exception.UnauthorizedException;
 import com.example.swcompetitionproject.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChattingService {
@@ -30,6 +33,7 @@ public class ChattingService {
     public ChattingRoomListData getRoomList(User user) {
         List<ChattingRoom> rooms = userRoomRepository.findByUser(user).stream()
                 .map(UserRoom::getChattingRoom)
+                .sorted(Comparator.comparing(ChattingRoom::getCreatedAt).reversed())
                 .collect(Collectors.toList());
 
         return ChattingRoomListData.from(rooms);
@@ -81,6 +85,11 @@ public class ChattingService {
         ChattingRoom room = chattingRoomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
 
+        // 유저가 이미 채팅방에 있는지 확인
+        boolean isUserInRoom = userRoomRepository.existsByUserAndChattingRoom(user, room);
+        if (isUserInRoom) {
+            throw new UnauthorizedException(ErrorCode.USER_ALREADY_IN_ROOM);
+        }
         // 채팅방의 현재 인원 수와 최대 인원 수 비교
         if (room.getMemberCount() >= room.getBoard().getTotal()) {
             throw new UnauthorizedException(ErrorCode.ROOM_FULL);
@@ -119,6 +128,7 @@ public class ChattingService {
     /**
      * 채팅방 삭제하기
      **/
+    @Transactional
     public void deleteRoom(Board board) {
         chattingRoomRepository.deleteByBoard(board);
     }
@@ -130,6 +140,8 @@ public class ChattingService {
     public List<Message> getMessagesByRoomId(UUID roomId) {
         ChattingRoom room = chattingRoomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
+        List<Message> messages = messageRepository.findByChattingRoomOrderByCreatedAtAsc(room);
+        log.info("기존 메세지 조회 service: {} messages from room {}", messages.size(), roomId);
         return messageRepository.findByChattingRoomOrderByCreatedAtAsc(room);
     }
 

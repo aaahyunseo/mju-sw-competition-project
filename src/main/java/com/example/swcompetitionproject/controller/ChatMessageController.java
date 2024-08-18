@@ -1,17 +1,28 @@
 package com.example.swcompetitionproject.controller;
 
 import com.example.swcompetitionproject.authentication.AuthenticatedUser;
+import com.example.swcompetitionproject.dto.request.board.RoomIdDto;
 import com.example.swcompetitionproject.dto.request.chatting.ChatMessageDto;
+import com.example.swcompetitionproject.dto.response.ResponseDto;
+import com.example.swcompetitionproject.dto.response.chatting.ChattingRoomListData;
 import com.example.swcompetitionproject.entity.Message;
 import com.example.swcompetitionproject.entity.User;
 import com.example.swcompetitionproject.service.ChattingService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,6 +31,7 @@ import java.util.UUID;
  * (WebSocket 연결, 전송, 해제)
  **/
 
+@Slf4j
 @RequiredArgsConstructor
 @Controller
 public class ChatMessageController {
@@ -27,29 +39,50 @@ public class ChatMessageController {
     private final ChattingService chattingService;
 
     /**
+     * 채팅방 목록 조회
+     **/
+    @GetMapping("/chat")
+    public ResponseEntity<ResponseDto<ChattingRoomListData>> getRoomList(@AuthenticatedUser User user) {
+        ChattingRoomListData chattingRoomListData = chattingService.getRoomList(user);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "채팅 목록 조회 완료", chattingRoomListData), HttpStatus.OK);
+    }
+
+    /**
+     * 다른 유저의 채팅방 입장하기
+     **/
+    @PostMapping("/chat")
+    public ResponseEntity<ResponseDto<Void>> getRoomList(@AuthenticatedUser User user, @Valid @RequestBody RoomIdDto roomIdDto) {
+        boolean isNewUser = chattingService.isNewUserInRoom(user, roomIdDto.getRoomId());
+        // 만약 새로운 유저라면, 채팅방 입장 메시지 전송
+        if (isNewUser) {
+            chattingService.addUserToRoom(user, roomIdDto.getRoomId());
+            ChatMessageDto enterMessageDto = ChatMessageDto.builder()
+                    .roomId(roomIdDto.getRoomId())
+                    .content(user.getName() + "님이 채팅방에 입장하였습니다.")
+                    .sender(user.getName())
+                    .timestamp(LocalDateTime.now())
+                    .build();
+            template.convertAndSend("/sub/ws/chat/room/" + roomIdDto.getRoomId(), enterMessageDto);
+            chattingService.saveMessage(enterMessageDto);
+        }
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "다른 유저 채팅방 입장 완료"), HttpStatus.CREATED);
+    }
+
+    /**
      * 채팅방 입장하기
      **/
     @MessageMapping("/ws/chat/{roomId}/enter")
-    public void enter(@DestinationVariable UUID roomId, @AuthenticatedUser User user) {
-        // 새로운 유저 판단
-        boolean isNewUser = chattingService.isNewUserInRoom(user, roomId);
-
-        // 사용자가 처음 입장하는 경우에만 입장 메시지 전송
-        if (isNewUser) {
-            // 사용자를 채팅방에 추가
-            chattingService.addUserToRoom(user, roomId);
-            // 입장 메시지 생성 및 전송
-            ChatMessageDto enterMessageDto = new ChatMessageDto(roomId, user.getName() + "님이 입장하셨습니다.", user.getStudentNumber());
-            template.convertAndSend("/sub/ws/chat/room/" + roomId, enterMessageDto);
-        }
-
+    public void enter(@DestinationVariable UUID roomId) {
         // 기존 메시지들 전송 (처음 입장하는 유저가 아닌 경우에만)
-        if (!isNewUser) {
-            List<Message> previousMessages = chattingService.getMessagesByRoomId(roomId);
-            for (Message message : previousMessages) {
-                ChatMessageDto messageDto = new ChatMessageDto(roomId, message.getContent(), message.getSender());
-                template.convertAndSend("/sub/ws/chat/room/" + roomId, messageDto);
-            }
+        List<Message> previousMessages = chattingService.getMessagesByRoomId(roomId);
+        for (Message message : previousMessages) {
+            ChatMessageDto messageDto = ChatMessageDto.builder()
+                    .roomId(roomId)
+                    .content(message.getContent())
+                    .sender(message.getSender())
+                    .timestamp(message.getCreatedAt())
+                    .build();
+            template.convertAndSend("/sub/ws/chat/room/" + roomId, messageDto);
         }
     }
 
@@ -58,6 +91,7 @@ public class ChatMessageController {
      **/
     @MessageMapping("/ws/chat/send")
     public void message(@Payload ChatMessageDto message) {
+        message.setTimestamp(LocalDateTime.now());
         // MessageRepository 에 메시지 저장
         chattingService.saveMessage(message);
         // 메시지 전송
@@ -68,12 +102,19 @@ public class ChatMessageController {
      * 채팅방 퇴장하기
      **/
     @MessageMapping("/ws/chat/{roomId}/quit")
-    public void quit(@DestinationVariable UUID roomId, @AuthenticatedUser User user) {
+    public void quit(@DestinationVariable UUID roomId, @AuthenticatedUser User user, @Payload ChatMessageDto message) {
         // 사용자를 채팅방에서 제거
         chattingService.removeUserFromRoom(user, roomId);
 
-        // 퇴장 메시지 생성 및 전송
-        ChatMessageDto quitMessage = new ChatMessageDto(roomId, user.getName() + "님이 퇴장하셨습니다.", user.getStudentNumber());
-        template.convertAndSend("/sub/ws/chat/room/" + roomId, quitMessage);
+        log.info("퇴장 완료");
+        // 퇴장 메시지 생성 및 타임스탬프 설정
+        ChatMessageDto quitMessage = ChatMessageDto.builder()
+                .roomId(roomId)
+                .content(message.getSender() + "님이 퇴장하셨습니다.")
+                .sender(message.getSender())
+                .timestamp(LocalDateTime.now()) // 현재 시간을 타임스탬프로 설정
+                .build();
+        template.convertAndSend("/sub/ws/chat/room/" + message.getRoomId(), quitMessage);
+        log.info("퇴장 메세지 전송 완료");
     }
 }
