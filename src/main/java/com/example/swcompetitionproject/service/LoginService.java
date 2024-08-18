@@ -15,7 +15,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -29,55 +29,57 @@ public class LoginService {
     private final UserRepository userRepository;
 
 
-    private static final String USER_CHECK_URL = "https://sso1.mju.ac.kr/mju/userCheck.do"; //유저체크 URL
-    private static final String LOGIN_URL = "https://sso1.mju.ac.kr/login/ajaxActionLogin2.do";
-    private static final String TOKEN_URL = "https://sso1.mju.ac.kr/oauth2/token2.do";
-    private static final String LOGIN_BANDI_URL = "https://lms.mju.ac.kr/ilos/lo/login_bandi_sso.acl";
-
-    private static final String TEST="https://search.naver.com/search.naver?where=news&sm=tab_jum&query=뉴스";
+    public static final String usercheckURL = "https://sso1.mju.ac.kr/mju/userCheck.do";
+    public static final String loginURL = "https://sso1.mju.ac.kr/login/ajaxActionLogin2.do";
+    public static final String token2URL = "https://sso1.mju.ac.kr/oauth2/token2.do";
+    public static final String loginBandiURL = "https://lms.mju.ac.kr/ilos/lo/login_bandi_sso.acl";
 
 
     public TokenResponseDto login(LoginDto loginDto) {
-        log.info("Starting login process for user: {}", loginDto.getId());
-
-        /**
-         * 요청할 데이터 requestEntity만들기
-         */
+        // 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        MultiValueMap<String, String> userCheckParams = new LinkedMultiValueMap<>();
-        userCheckParams.add("id", loginDto.getId());
-        userCheckParams.add("passwrd", loginDto.getPasswrd());
-        userCheckParams.add("redirect_uri", "http://lms.mju.ac.kr/ilos/bandi/sso/index.jsp");
+        //유저 정보 입력 데이터
+        MultiValueMap<String, String> userData = new LinkedMultiValueMap<>();
+        userData.add("id", loginDto.getId());
+        userData.add("passwrd", loginDto.getPasswrd());
 
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(userCheckParams, headers);
+        // HttpEntity 생성
+        HttpEntity<MultiValueMap<String, String>> userDatarequestEntity = new HttpEntity<>(userData, headers);
 
-        /**
-         * 유저 존재 확인
-         */
-        String userCheckResponse = restTemplate.postForObject(USER_CHECK_URL, requestEntity, String.class);
+        //유저 존재 확인
+        ResponseEntity<Map> userCheckRes = restTemplate.exchange(usercheckURL, HttpMethod.POST, userDatarequestEntity, Map.class);
 
-        //체크중에 요류코드가 존재한다면 로그인 실패
-        if (userCheckResponse.contains("VL-2100")) {
-            log.error("User check failed: {}", userCheckResponse);
-            throw new RuntimeException("User check failed: " + userCheckResponse);
+        // JSON 응답 파싱
+        Map<String, Object> userCheckResJson = userCheckRes.getBody();
+
+        // 에러 코드 확인
+        if (userCheckResJson != null && !userCheckResJson.get("error").equals("0000") && !userCheckResJson.get("error").equals("VL-3130")) {
+            throw new RuntimeException(userCheckResJson.toString());
         }
-        log.info("User check response: {}", userCheckResponse);
 
-        /**
-         * 로그인
-         */
-        ResponseEntity<String> loginResponseEntity = restTemplate.exchange(LOGIN_URL, HttpMethod.POST, requestEntity, String.class);
-        HttpStatus statusCode = (HttpStatus) loginResponseEntity.getStatusCode();
-        String loginRespons = loginResponseEntity.getBody();
-        HttpHeaders headersss = loginResponseEntity.getHeaders();
 
-        //결과 확인
-        log.info("loginResponseEntity: {}", loginResponseEntity);
-        log.info("HTTP Status Code: {}", statusCode);
-        log.info("login response: {}", loginRespons);
-        log.info("Response headers: {}", headersss);
+        //로그인 데이터 생성
+        MultiValueMap<String, String> loginData = new LinkedMultiValueMap<>();
+        loginData.add("id", loginDto.getId());
+        loginData.add("passwrd", loginDto.getPasswrd());
+        loginData.add("redirect_uri", "http://lms.mju.ac.kr/ilos/bandi/sso/index.jsp");
+
+        // HttpEntity 생성
+        HttpEntity<MultiValueMap<String, String>> loginDatarequestEntity = new HttpEntity<>(loginData, headers);
+
+        // POST 요청 보내기 (응답 처리 없이 세션 생성 목적)
+        restTemplate.exchange(loginURL, HttpMethod.POST, loginDatarequestEntity, String.class);
+        log.info("로그인 완료");
+
+
+        restTemplate.exchange(token2URL, HttpMethod.POST, loginDatarequestEntity, String.class);
+        log.info("토큰 유얄엘 처리 완료");
+
+
+        ResponseEntity<String> loginBandiRes = restTemplate.getForEntity(loginBandiURL, String.class);
+        log.info("로그인 확인: {}", loginBandiRes);
 
         User user;
         //유저가 디비에 등록되어있는지 확인
@@ -92,43 +94,6 @@ public class LoginService {
                     .build();
             userRepository.save(user);
         }
-
-
-        //var login =restTemplate.getForObject(TEST,String.class);
-        //log.info(login);
-
-
-        /**
-         * 현재 사용 안하는 코드
-         * */
-        //토큰 발급하는 URL로 연결
-        //String tokenResponse = restTemplate.postForObject(TOKEN_URL, requestEntity, String.class);
-        //log.info("tokenResponse: {}", tokenResponse);
-
-        //첫 번째 요청에서 받은 리다이렉션 URL을 가져와 다시 요청을 보냄->이미 주소를 알고있기 때문에 주석처리
-        HttpHeaders responseHeaders = restTemplate.postForEntity(TOKEN_URL, requestEntity, String.class).getHeaders();
-        log.info("responseHeaders: {}", responseHeaders);
-        String redirectUrl = responseHeaders.getLocation().toString(); // 리다이렉션 URL 가져오기
-        log.info("redirectUrl: {}",redirectUrl);
-
-        //// 쿠키를 가져와 로깅 또는 수동으로 처리
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(redirectUrl,requestEntity, String.class);
-        HttpHeaders headersCookies = responseEntity.getHeaders();
-        log.info("responseEntity: {}", responseEntity);
-
-        //여기사부터 쿠키가 없다고 나옴
-        List<String> cookies = headersCookies.get(HttpHeaders.SET_COOKIE);
-        if (cookies != null) {
-            for (String cookie : cookies) {
-                log.info("JSESSIONID: {}", cookie);
-                // 필요 시 쿠키를 수동으로 추가할 수 있음
-            }
-        }
-
-        // 리다이렉션된 URL로 재요청
-        String redirecTtokenResponse = restTemplate.postForObject(LOGIN_BANDI_URL, requestEntity, String.class);
-        log.info("tokenResponse after redirection: {}", redirecTtokenResponse);
-
 
         /**
          * payload와 accessToken발급
