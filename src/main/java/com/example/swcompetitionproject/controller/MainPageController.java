@@ -1,6 +1,6 @@
 package com.example.swcompetitionproject.controller;
 
-import com.example.swcompetitionproject.dto.response.ResponseDto;
+import com.example.swcompetitionproject.dto.response.auth.ResponseDto;
 import com.example.swcompetitionproject.dto.response.mainpage.MainPageResponseData;
 import com.example.swcompetitionproject.service.MainPageService;
 import lombok.RequiredArgsConstructor;

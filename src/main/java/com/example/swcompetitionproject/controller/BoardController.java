@@ -5,7 +5,7 @@ import com.example.swcompetitionproject.dto.request.board.CreateBoardDto;
 import com.example.swcompetitionproject.dto.request.board.UpdateBoardDto;
 import com.example.swcompetitionproject.dto.response.board.BoardData;
 import com.example.swcompetitionproject.dto.response.board.BoardListData;
-import com.example.swcompetitionproject.dto.response.ResponseDto;
+import com.example.swcompetitionproject.dto.response.auth.ResponseDto;
 import com.example.swcompetitionproject.entity.User;
 import com.example.swcompetitionproject.service.BoardService;
 import jakarta.validation.Valid;
