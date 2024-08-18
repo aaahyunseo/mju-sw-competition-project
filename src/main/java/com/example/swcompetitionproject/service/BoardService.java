@@ -40,10 +40,27 @@ public class BoardService {
      * 게시글 상세 조회
      **/
     @Transactional
-    public BoardData getBoardById(String dormitory, UUID boardId) {
+    public BoardData getBoardById(User user, String dormitory, UUID boardId) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
         Board board = boardRepository.findBoardByDormitoryAndId(dormitoryType, boardId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.BOARD_NOT_FOUND));
+
+        // 기존의 BoardCategories를 가져와서 처리
+        List<BoardCategory> existingCategories = board.getBoardCategories();
+
+        // 기존의 카테고리 리스트를 클리어하고 새로운 카테고리를 추가
+        existingCategories.clear();
+
+        List<BoardCategory> boardCategories = user.getCategory().stream()
+                .map(category -> BoardCategory.builder()
+                        .board(board)
+                        .category(category)
+                        .build())
+                .collect(Collectors.toList());
+
+        // 기존 리스트에 새로 생성한 카테고리 추가
+        existingCategories.addAll(boardCategories);
+
         return BoardData.from(board);
     }
 
