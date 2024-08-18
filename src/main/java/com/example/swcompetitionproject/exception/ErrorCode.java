@@ -15,6 +15,7 @@ public enum ErrorCode {
     INVALID_GENDER("4013", "유효하지 않은 성별입니다."),
     ROOM_FULL("4014", "채팅방 인원이 가득찼습니다."),
     ALREADY_LIKED("4015","이미 좋아요를 눌렀습니다."),
+    USER_ALREADY_IN_ROOM("4016","이미 채팅방에 추가된 멤버입니다."),
 
     //ForbiddenException
     NO_ACCESS("4030", "접근 권한이 없습니다."),
