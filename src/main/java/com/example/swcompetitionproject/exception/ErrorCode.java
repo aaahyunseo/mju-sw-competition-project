@@ -14,6 +14,7 @@ public enum ErrorCode {
     INVALID_DORMITORY("4012", "유효하지 않은 기숙사입니다."),
     INVALID_GENDER("4013", "유효하지 않은 성별입니다."),
     ROOM_FULL("4014", "채팅방 인원이 가득찼습니다."),
+    ALREADY_LIKED("4015","이미 좋아요를 눌렀습니다."),
 
     //ForbiddenException
     NO_ACCESS("4030", "접근 권한이 없습니다."),
@@ -25,6 +26,7 @@ public enum ErrorCode {
     ROOM_NOT_FOUND("4042", "방을 찾을 수 없습니다."),
     BOARD_NOT_FOUND("4043", "게시글을 찾을 수 없습니다."),
     CATEGORY_NOT_FOUND("4044", "카테고리를 찾을 수 없습니다"),
+    LIKE_NOT_FOUND("4045","좋아요를 찾을 수 없습니다."),
 
     //ConflictException
 

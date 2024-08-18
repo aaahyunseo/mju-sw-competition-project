@@ -6,9 +6,9 @@ import com.example.swcompetitionproject.entity.Message;
 import com.example.swcompetitionproject.entity.User;
 import com.example.swcompetitionproject.service.ChattingService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
@@ -20,11 +20,10 @@ import java.util.UUID;
  * (WebSocket 연결, 전송, 해제)
  **/
 
-@Profile("stomp")
 @RequiredArgsConstructor
 @Controller
 public class ChatMessageController {
-    private final SimpMessagingTemplate template;   // 기본브로커
+    private final SimpMessagingTemplate template;
     private final ChattingService chattingService;
 
     /**
@@ -58,7 +57,7 @@ public class ChatMessageController {
      * 채팅방에 메시지 보내기
      **/
     @MessageMapping("/ws/chat/send")
-    public void message(ChatMessageDto message) {
+    public void message(@Payload ChatMessageDto message) {
         // MessageRepository 에 메시지 저장
         chattingService.saveMessage(message);
         // 메시지 전송

@@ -4,15 +4,13 @@ import com.example.swcompetitionproject.dto.request.board.CreateBoardDto;
 import com.example.swcompetitionproject.dto.request.board.UpdateBoardDto;
 import com.example.swcompetitionproject.dto.response.board.BoardData;
 import com.example.swcompetitionproject.dto.response.board.BoardListData;
-import com.example.swcompetitionproject.entity.Board;
-import com.example.swcompetitionproject.entity.BoardCategory;
-import com.example.swcompetitionproject.entity.DormitoryType;
-import com.example.swcompetitionproject.entity.User;
+import com.example.swcompetitionproject.entity.*;
 import com.example.swcompetitionproject.exception.ErrorCode;
 import com.example.swcompetitionproject.exception.ForbiddenException;
 import com.example.swcompetitionproject.exception.NotFoundException;
 import com.example.swcompetitionproject.exception.UnauthorizedException;
 import com.example.swcompetitionproject.repository.BoardRepository;
+import com.example.swcompetitionproject.repository.InterestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,25 +24,43 @@ import java.util.stream.Collectors;
 public class BoardService {
     private final BoardRepository boardRepository;
     private final ChattingService chattingService;
+    private final InterestRepository interestRepository;
 
     /**
      * 게시글 전체 조회
      **/
     @Transactional
-    public BoardListData getBoardList(String dormitory) {
+    public BoardListData getBoardList(User user, String dormitory) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
         List<Board> boards = boardRepository.findAllByDormitoryOrderByCreatedAtDesc(dormitoryType);
-        return BoardListData.from(boards);
+        return BoardListData.of(boards, user, interestRepository);
     }
 
     /**
      * 게시글 상세 조회
      **/
     @Transactional
-    public BoardData getBoardById(String dormitory, UUID boardId) {
+    public BoardData getBoardById(User user, String dormitory, UUID boardId) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
         Board board = boardRepository.findBoardByDormitoryAndId(dormitoryType, boardId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.BOARD_NOT_FOUND));
+
+        // 기존의 BoardCategories를 가져와서 처리
+        List<BoardCategory> existingCategories = board.getBoardCategories();
+
+        // 기존의 카테고리 리스트를 클리어하고 새로운 카테고리를 추가
+        existingCategories.clear();
+
+        List<BoardCategory> boardCategories = user.getCategory().stream()
+                .map(category -> BoardCategory.builder()
+                        .board(board)
+                        .category(category)
+                        .build())
+                .collect(Collectors.toList());
+
+        // 기존 리스트에 새로 생성한 카테고리 추가
+        existingCategories.addAll(boardCategories);
+
         return BoardData.from(board);
     }
 
@@ -112,6 +128,47 @@ public class BoardService {
         Board board = boardValidate(dormitoryType, boardId, user);
         boardRepository.delete(board);
         chattingService.deleteRoom(board);
+    }
+
+    /**
+     * 게시글 좋아요 등록
+     **/
+    @Transactional
+    public void likeBoard(User user, UUID boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.BOARD_NOT_FOUND));
+        //이미 좋아요를 누른 게시물
+        if (interestRepository.existsByUserAndBoard(user, board)) {
+            throw new UnauthorizedException(ErrorCode.ALREADY_LIKED);
+        }
+
+        Interest like = Interest.builder()
+                .user(user)
+                .board(board)
+                .build();
+        interestRepository.save(like);
+    }
+
+    /**
+     * 게시글 좋아요 삭제
+     **/
+    @Transactional
+    public void unlikeBoard(User user, UUID boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.BOARD_NOT_FOUND));
+        Interest like = interestRepository.findByUserAndBoard(user, board)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.LIKE_NOT_FOUND));
+
+        interestRepository.delete(like);
+    }
+
+    /**
+     * 관심 게시글 조회
+     **/
+    @Transactional
+    public BoardListData getLikedBoards(User user) {
+        List<Board> likedBoards = interestRepository.findBoardsByUser(user);
+        return BoardListData.from(likedBoards);
     }
 
     /**

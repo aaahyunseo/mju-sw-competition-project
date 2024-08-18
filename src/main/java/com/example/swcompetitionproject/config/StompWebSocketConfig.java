@@ -9,8 +9,6 @@ import org.springframework.web.socket.config.annotation.*;
 public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws/chat")   // 클라이언트에서 서버로 WebSocket 연결하기 위해 /ws/chat 으로 요청을 보내도록 엔트포인트 설정
-                .setAllowedOriginPatterns("*");  // 클라이언트에서 웹 소켓 서버에 요청하는 모든 요청을 수락, CORS 방지
         registry.addEndpoint("/ws/chat")
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
