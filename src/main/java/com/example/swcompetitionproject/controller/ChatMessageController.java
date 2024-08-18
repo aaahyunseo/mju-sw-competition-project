@@ -3,7 +3,7 @@ package com.example.swcompetitionproject.controller;
 import com.example.swcompetitionproject.authentication.AuthenticatedUser;
 import com.example.swcompetitionproject.dto.request.board.RoomIdDto;
 import com.example.swcompetitionproject.dto.request.chatting.ChatMessageDto;
-import com.example.swcompetitionproject.dto.response.ResponseDto;
+import com.example.swcompetitionproject.dto.response.auth.ResponseDto;
 import com.example.swcompetitionproject.dto.response.chatting.ChattingRoomListData;
 import com.example.swcompetitionproject.entity.Message;
 import com.example.swcompetitionproject.entity.User;
@@ -72,7 +72,7 @@ public class ChatMessageController {
      * 채팅방 입장하기
      **/
     @MessageMapping("/ws/chat/{roomId}/enter")
-    public void enter(@DestinationVariable UUID roomId, @AuthenticatedUser User user) {
+    public void enter(@DestinationVariable UUID roomId) {
         // 기존 메시지들 전송 (처음 입장하는 유저가 아닌 경우에만)
         List<Message> previousMessages = chattingService.getMessagesByRoomId(roomId);
         for (Message message : previousMessages) {
@@ -104,14 +104,14 @@ public class ChatMessageController {
     @MessageMapping("/ws/chat/{roomId}/quit")
     public void quit(@DestinationVariable UUID roomId, @AuthenticatedUser User user, @Payload ChatMessageDto message) {
         // 사용자를 채팅방에서 제거
-        chattingService.removeUserFromRoom(user, message.getRoomId());
+        chattingService.removeUserFromRoom(user, roomId);
 
         log.info("퇴장 완료");
         // 퇴장 메시지 생성 및 타임스탬프 설정
         ChatMessageDto quitMessage = ChatMessageDto.builder()
                 .roomId(roomId)
-                .content(user.getName() + "님이 퇴장하셨습니다.")
-                .sender(user.getName())
+                .content(message.getSender() + "님이 퇴장하셨습니다.")
+                .sender(message.getSender())
                 .timestamp(LocalDateTime.now()) // 현재 시간을 타임스탬프로 설정
                 .build();
         template.convertAndSend("/sub/ws/chat/room/" + message.getRoomId(), quitMessage);
