@@ -7,7 +7,6 @@ import com.example.swcompetitionproject.dto.request.auth.LoginDto;
 import com.example.swcompetitionproject.dto.response.auth.LoginResponseDto;
 import com.example.swcompetitionproject.dto.response.ResponseDto;
 import com.example.swcompetitionproject.dto.response.auth.TokenResponseDto;
-import com.example.swcompetitionproject.dto.response.TokenResponseDto;
 import com.example.swcompetitionproject.entity.User;
 import com.example.swcompetitionproject.service.LoginService;
 import jakarta.servlet.http.HttpServletResponse;
