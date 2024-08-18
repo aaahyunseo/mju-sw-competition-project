@@ -1,11 +1,12 @@
 package com.example.swcompetitionproject.dto.response.board;
 
 import com.example.swcompetitionproject.entity.Board;
+import com.example.swcompetitionproject.entity.DormitoryType;
 import com.example.swcompetitionproject.entity.GenderType;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -20,8 +21,9 @@ public class BoardDetailResponseDto {
     private int current;
     private int total;
     private GenderType gender;
+    private DormitoryType dormitory;
     private boolean like;
-    private String createdAt;
+    private LocalDateTime createdAt;
 
     public static BoardDetailResponseDto of(Boolean isLike, Board board){
         return BoardDetailResponseDto.builder()
@@ -34,8 +36,9 @@ public class BoardDetailResponseDto {
                 .current(board.getChattingRoom().getMemberCount())
                 .total(board.getTotal())
                 .gender(board.getUser().getGender())
+                .dormitory(board.getDormitory())
                 .like(isLike)
-                .createdAt(board.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+                .createdAt(board.getCreatedAt())
                 .build();
     }
 }
