@@ -25,7 +25,7 @@ public class BoardController {
     //게시글 전체 조회
     @GetMapping
     public ResponseEntity<ResponseDto<BoardListData>> getBoardList(@AuthenticatedUser User user, @RequestParam(value = "dormitory") String dormitory) {
-        BoardListData boardListData = boardService.getBoardList(dormitory);
+        BoardListData boardListData = boardService.getBoardList(user, dormitory);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 목록 조회 완료", boardListData), HttpStatus.OK);
     }
 
@@ -63,6 +63,27 @@ public class BoardController {
                                                          @AuthenticatedUser User user) {
         boardService.deleteBoard(dormitory, boardId, user);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 삭제 완료"), HttpStatus.OK);
+    }
+
+    // 게시글 좋아요 등록
+    @PostMapping("/{boardId}/like")
+    public ResponseEntity<ResponseDto<Void>> likeBoard(@AuthenticatedUser User user, @PathVariable UUID boardId) {
+        boardService.likeBoard(user, boardId);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 좋아요 등록 완료"), HttpStatus.OK);
+    }
+
+    // 게시글 좋아요 삭제
+    @DeleteMapping("/{boardId}/like")
+    public ResponseEntity<ResponseDto<Void>> unlikeBoard(@AuthenticatedUser User user, @PathVariable UUID boardId) {
+        boardService.unlikeBoard(user, boardId);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "게시글 좋아요 삭제 완료"), HttpStatus.OK);
+    }
+
+    // 사용자가 좋아요를 누른 게시글 목록 조회
+    @GetMapping("/likes")
+    public ResponseEntity<ResponseDto<BoardListData>> getLikedBoards(@AuthenticatedUser User user) {
+        BoardListData interestListData = boardService.getLikedBoards(user);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "좋아요한 게시글 목록 조회 완료", interestListData), HttpStatus.OK);
     }
 }
 
