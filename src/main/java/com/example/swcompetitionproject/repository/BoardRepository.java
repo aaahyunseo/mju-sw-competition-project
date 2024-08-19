@@ -22,4 +22,6 @@ public interface BoardRepository extends JpaRepository<Board, UUID> {
     int countByDormitory(DormitoryType dormitoryType);
 
     Optional<Board> findBoardByChattingRoom(ChattingRoom chattingRoom);
+
+    List<Board> findAllByUser(User user);
 }
