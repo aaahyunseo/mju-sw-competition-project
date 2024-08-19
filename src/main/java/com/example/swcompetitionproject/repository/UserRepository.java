@@ -12,4 +12,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @EntityGraph(attributePaths = "category")
     Optional<User> findById(UUID id);
+
+    Optional<User> findByName(String name);
 }
