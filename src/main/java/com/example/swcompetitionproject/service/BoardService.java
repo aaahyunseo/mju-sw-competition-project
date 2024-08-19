@@ -10,11 +10,13 @@ import com.example.swcompetitionproject.exception.ForbiddenException;
 import com.example.swcompetitionproject.exception.NotFoundException;
 import com.example.swcompetitionproject.exception.UnauthorizedException;
 import com.example.swcompetitionproject.repository.BoardRepository;
+import com.example.swcompetitionproject.repository.ChattingRoomRepository;
 import com.example.swcompetitionproject.repository.InterestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -25,6 +27,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final ChattingService chattingService;
     private final InterestRepository interestRepository;
+    private final ChattingRoomRepository chattingRoomRepository;
 
     /**
      * 게시글 전체 조회
@@ -32,8 +35,28 @@ public class BoardService {
     @Transactional
     public BoardListData getBoardList(User user, String dormitory) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
+        //해당 건물에 대한 모든 게시물
         List<Board> boards = boardRepository.findAllByDormitoryOrderByCreatedAtDesc(dormitoryType);
-        return BoardListData.of(boards, user, interestRepository);
+
+        // 가득 찬 게시물과 그렇지 않은 게시물을 저장할 리스트
+        List<Board> fullBoards = new LinkedList<>();
+        List<Board> notFullBoards = new LinkedList<>();
+
+        // 반복문을 사용해 게시물을 분류
+        for (Board board : boards) {
+            if (board.getTotal() == chattingRoomRepository.findByBoard(board).get().getMemberCount()) {
+                fullBoards.add(board); // 가득 찬 게시물
+            } else {
+                notFullBoards.add(board); // 인원 미달 게시물
+            }
+        }
+
+        // 가득 찬 게시물 리스트와 인원 미달 게시물 리스트를 합침
+        List<Board> resultBoards = new LinkedList<>();
+        resultBoards.addAll(notFullBoards);
+        resultBoards.addAll(fullBoards);
+
+        return BoardListData.of(resultBoards, user, interestRepository);
     }
 
     /**
