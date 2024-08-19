@@ -3,8 +3,10 @@ package com.example.swcompetitionproject.service;
 import com.example.swcompetitionproject.dto.request.user.CreateUserCategoryDto;
 import com.example.swcompetitionproject.dto.request.user.ModifyUserInfoDto;
 import com.example.swcompetitionproject.dto.request.user.UserInfoDto;
+import com.example.swcompetitionproject.dto.request.user.UserProfileDto;
 import com.example.swcompetitionproject.dto.response.board.MyBoardListData;
 import com.example.swcompetitionproject.dto.response.category.CategoryListData;
+import com.example.swcompetitionproject.dto.response.user.UserProfileResponseDto;
 import com.example.swcompetitionproject.dto.response.user.UserResponseDto;
 import com.example.swcompetitionproject.entity.*;
 import com.example.swcompetitionproject.exception.ConflictException;
@@ -139,5 +141,23 @@ public class MyPageService {
             }
         }
         throw new UnauthorizedException(ErrorCode.INVALID_GENDER);
+    }
+
+    /**
+     * 유저 프로필 조회
+     */
+    public UserProfileResponseDto getUserProfile(UserProfileDto userProfileDto){
+        User profileUser=userRepository.findByName(userProfileDto.getName())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        List<Category> categoriesLsit = categoryRepository.findAllByUserOrderByCreatedAtAsc(profileUser);
+        CategoryListData categories= CategoryListData.from(categoriesLsit);
+
+        UserProfileResponseDto userProfileResponseDto= UserProfileResponseDto.builder()
+                .categoryListData(categories)
+                .name(profileUser.getName())
+                .build();
+
+        return userProfileResponseDto;
     }
 }

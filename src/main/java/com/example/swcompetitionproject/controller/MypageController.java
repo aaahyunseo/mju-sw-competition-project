@@ -4,9 +4,11 @@ import com.example.swcompetitionproject.authentication.AuthenticatedUser;
 import com.example.swcompetitionproject.dto.request.user.CreateUserCategoryDto;
 import com.example.swcompetitionproject.dto.request.user.ModifyUserInfoDto;
 import com.example.swcompetitionproject.dto.request.user.UserInfoDto;
+import com.example.swcompetitionproject.dto.request.user.UserProfileDto;
 import com.example.swcompetitionproject.dto.response.ResponseDto;
 import com.example.swcompetitionproject.dto.response.board.MyBoardListData;
 import com.example.swcompetitionproject.dto.response.category.CategoryListData;
+import com.example.swcompetitionproject.dto.response.user.UserProfileResponseDto;
 import com.example.swcompetitionproject.dto.response.user.UserResponseDto;
 import com.example.swcompetitionproject.entity.User;
 import com.example.swcompetitionproject.service.MyPageService;
@@ -85,5 +87,14 @@ public class MypageController {
     public ResponseEntity<ResponseDto<CategoryListData>> getUserCategoryList(@AuthenticatedUser User user) {
         CategoryListData categoryList = myPageService.getUserCategoryList(user);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "유저 카테고리 전체 조회 완료", categoryList), HttpStatus.OK);
+    }
+
+    /**
+     * 유저 프로필 조회
+     */
+    @PostMapping("/profile")
+    public ResponseEntity<ResponseDto<UserProfileResponseDto>> getUserProfile(@AuthenticatedUser User user, @RequestBody UserProfileDto userProfileDto){
+        UserProfileResponseDto userProfileResponseDto=myPageService.getUserProfile(userProfileDto);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "유저 프로필 조회 완료", userProfileResponseDto), HttpStatus.OK);
     }
 }
