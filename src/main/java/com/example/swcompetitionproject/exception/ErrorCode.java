@@ -20,7 +20,8 @@ public enum ErrorCode {
 
     //ForbiddenException
     NO_ACCESS("4030", "접근 권한이 없습니다."),
-    FORBIDDEN_GENDER("4031", "다른 성별의 기숙사 채팅에는 참여할 수 없습니다."),
+    FORBIDDEN_GENDER_ROOM("4031", "다른 성별의 기숙사 채팅방에는 참여할 수 없습니다."),
+    FORBIDDEN_GENDER_BOARD("4032","다른 성별의 기숙사 게시판에는 게시글을 작성할 수 없습니다."),
 
     //NotFoundException
     COOKIE_NOT_FOUND("4040", "쿠키를 찾을 수 없습니다."),
