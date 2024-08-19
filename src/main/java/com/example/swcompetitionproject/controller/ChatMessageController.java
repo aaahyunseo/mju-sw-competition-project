@@ -48,7 +48,7 @@ public class ChatMessageController {
     }
 
     /**
-     * 다른 유저의 채팅방 입장하기
+     * 채팅방 입장하기
      **/
     @PostMapping("/chat")
     public ResponseEntity<ResponseDto<Void>> getRoomList(@AuthenticatedUser User user, @Valid @RequestBody RoomIdDto roomIdDto) {
@@ -68,11 +68,11 @@ public class ChatMessageController {
             template.convertAndSend("/sub/ws/chat/room/" + roomIdDto.getRoomId(), enterMessageDto);
             chattingService.saveMessage(enterMessageDto);
         }
-        return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "다른 유저 채팅방 입장 완료"), HttpStatus.CREATED);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "채팅방에 입장하였습니다."), HttpStatus.CREATED);
     }
 
     /**
-     * 채팅방 입장하기
+     * 특정 채팅방 입장하기
      **/
     @MessageMapping("/ws/chat/{roomId}/enter")
     public void enter(@DestinationVariable UUID roomId) {

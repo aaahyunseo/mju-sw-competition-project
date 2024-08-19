@@ -146,8 +146,6 @@ public class ChattingService {
     public List<Message> getMessagesByRoomId(UUID roomId) {
         ChattingRoom room = chattingRoomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
-        List<Message> messages = messageRepository.findByChattingRoomOrderByCreatedAtAsc(room);
-        log.info("기존 메세지 조회 service: {} messages from room {}", messages.size(), roomId);
         return messageRepository.findByChattingRoomOrderByCreatedAtAsc(room);
     }
 
@@ -158,7 +156,6 @@ public class ChattingService {
     public boolean isNewUserInRoom(User user, UUID roomId) {
         ChattingRoom chattingRoom = chattingRoomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
-
         return !userRoomRepository.existsByUserAndChattingRoom(user, chattingRoom);
     }
 }
