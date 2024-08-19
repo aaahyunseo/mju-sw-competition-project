@@ -11,6 +11,7 @@ import com.example.swcompetitionproject.exception.ConflictException;
 import com.example.swcompetitionproject.exception.ErrorCode;
 import com.example.swcompetitionproject.exception.NotFoundException;
 import com.example.swcompetitionproject.exception.UnauthorizedException;
+import com.example.swcompetitionproject.repository.BoardCategoryRepository;
 import com.example.swcompetitionproject.repository.BoardRepository;
 import com.example.swcompetitionproject.repository.CategoryRepository;
 import com.example.swcompetitionproject.repository.UserRepository;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -27,6 +29,7 @@ public class MyPageService {
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
     private final CategoryRepository categoryRepository;
+    private final BoardCategoryRepository boardCategoryRepository;
 
     /**
      * 유저 정보 등록
@@ -91,8 +94,18 @@ public class MyPageService {
                 .category(createUserCategoryDto.getCategory())
                 .user(user)
                 .build();
-
         categoryRepository.save(newCategory);
+
+        // 유저의 모든 게시글에 대해 새로운 BoardCategory 생성
+        List<Board> userBoards = boardRepository.findAllByUser(user);
+        List<BoardCategory> newBoardCategories = userBoards.stream()
+                .map(board -> BoardCategory.builder()
+                        .board(board)
+                        .category(newCategory)
+                        .build())
+                .collect(Collectors.toList());
+
+        boardCategoryRepository.saveAll(newBoardCategories);
     }
 
     /**
@@ -102,6 +115,9 @@ public class MyPageService {
         Category category = categoryRepository.findByUserAndId(user, categoryId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
+        // 해당 카테고리와 연관된 모든 BoardCategory 삭제
+        List<BoardCategory> boardCategories = boardCategoryRepository.findAllByCategory(category);
+        boardCategoryRepository.deleteAll(boardCategories);
         categoryRepository.delete(category);
     }
 

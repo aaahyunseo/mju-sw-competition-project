@@ -27,6 +27,7 @@ public class ChattingService {
     private final MessageRepository messageRepository;
     private final UserRoomRepository userRoomRepository;
     private final UserRepository userRepository;
+    private final BoardRepository boardRepository;
 
     /**
      * 채팅방 목록 조회
@@ -129,6 +130,12 @@ public class ChattingService {
 
         room.setMemberCount(room.getMemberCount() - 1);
         chattingRoomRepository.save(room);
+
+        if(room.getMemberCount()==0){
+            Board board = boardRepository.findBoardByChattingRoom(room)
+                    .orElseThrow(() -> new ForbiddenException(ErrorCode.BOARD_NOT_FOUND));
+            boardRepository.delete(board);
+        }
     }
 
     /**
