@@ -30,6 +30,7 @@ public enum ErrorCode {
     LIKE_NOT_FOUND("4045","좋아요를 찾을 수 없습니다."),
 
     //ConflictException
+    DUPLICATED_NAME("4017","이미 사용중인 이름입니다."),
 
     //ValidationException
     NOT_NULL("9001", "필수값이 누락되었습니다."),
