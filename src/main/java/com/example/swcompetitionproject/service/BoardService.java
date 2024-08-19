@@ -76,6 +76,16 @@ public class BoardService {
     public void createBoard(String dormitory, CreateBoardDto createBoardDto, User user) {
         DormitoryType dormitoryType = dormitoryNameValidate(dormitory);
 
+        // 3동 기숙사 게시글에 여자 접근 금지
+        if (dormitoryType == DormitoryType.DORMITORY3 && user.getGender() == GenderType.FEMALE) {
+            throw new ForbiddenException(ErrorCode.FORBIDDEN_GENDER_ROOM);
+        }
+        // 4동, 5동 기숙사 게시글에 남자 접근 금지
+        if ((dormitoryType == DormitoryType.DORMITORY4 || dormitoryType == DormitoryType.DORMITORY5)
+                && user.getGender() == GenderType.MALE) {
+            throw new ForbiddenException(ErrorCode.FORBIDDEN_GENDER_ROOM);
+        }
+
         switch (dormitoryType) {
             case DORMITORY4:
                 createBoardDto.setTotal(2);
@@ -86,7 +96,7 @@ public class BoardService {
                 break;
             default:
                 if (createBoardDto.getTotal() == 0) throw new UnauthorizedException(ErrorCode.NOT_BLANK);
-                else if(createBoardDto.getTotal() != 0 && createBoardDto.getTotal() != 2 && createBoardDto.getTotal() != 4) {
+                else if (createBoardDto.getTotal() != 0 && createBoardDto.getTotal() != 2 && createBoardDto.getTotal() != 4) {
                     throw new BadRequestException(ErrorCode.BAD_REQUEST_TOTAL);
                 }
                 break;

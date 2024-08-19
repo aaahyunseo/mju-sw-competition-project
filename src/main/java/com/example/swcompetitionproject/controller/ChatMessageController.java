@@ -83,7 +83,7 @@ public class ChatMessageController {
             chattingService.enterRoom(chatMessageDto.getSender(), chatMessageDto.getRoomId());
             ChatMessageDto enterMessageDto = ChatMessageDto.builder()
                     .roomId(chatMessageDto.getRoomId())
-                    .content(chatMessageDto.getSender() + "님이 채팅방에 입장했습니다.")
+                    .content(chatMessageDto.getSender() + "님이 채팅방에 입장했습니다")
                     .sender(chatMessageDto.getSender())
                     .timestamp(LocalDateTime.now())
                     .build();
@@ -116,7 +116,7 @@ public class ChatMessageController {
         // 퇴장 메시지 생성 및 타임스탬프 설정
         ChatMessageDto quitMessage = ChatMessageDto.builder()
                 .roomId(roomId)
-                .content(message.getSender() + "님이 채팅방을 퇴장했습니다.")
+                .content(message.getSender() + "님이 채팅방을 퇴장했습니다")
                 .sender(message.getSender())
                 .timestamp(LocalDateTime.now()) // 현재 시간을 타임스탬프로 설정
                 .build();
