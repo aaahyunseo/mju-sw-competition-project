@@ -25,6 +25,7 @@ public class ChattingService {
     private final ChattingRoomRepository chattingRoomRepository;
     private final MessageRepository messageRepository;
     private final UserRoomRepository userRoomRepository;
+    private final UserRepository userRepository;
 
     /**
      * 채팅방 목록 조회
@@ -113,8 +114,11 @@ public class ChattingService {
      * 채팅방 퇴장하기
      **/
     @Transactional
-    public void removeUserFromRoom(User user, UUID roomId) {
-        ChattingRoom room = chattingRoomRepository.findById(roomId)
+    public void removeUserFromRoom(ChatMessageDto chatMessageDto) {
+        ChattingRoom room = chattingRoomRepository.findById(chatMessageDto.getRoomId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
+
+        User user = userRepository.findByName(chatMessageDto.getSender())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
 
         UserRoom userRoom = userRoomRepository.findByUserAndChattingRoom(user, room)
