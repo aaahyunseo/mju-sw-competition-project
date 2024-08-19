@@ -5,10 +5,7 @@ import com.example.swcompetitionproject.dto.request.board.UpdateBoardDto;
 import com.example.swcompetitionproject.dto.response.board.BoardData;
 import com.example.swcompetitionproject.dto.response.board.BoardListData;
 import com.example.swcompetitionproject.entity.*;
-import com.example.swcompetitionproject.exception.ErrorCode;
-import com.example.swcompetitionproject.exception.ForbiddenException;
-import com.example.swcompetitionproject.exception.NotFoundException;
-import com.example.swcompetitionproject.exception.UnauthorizedException;
+import com.example.swcompetitionproject.exception.*;
 import com.example.swcompetitionproject.repository.BoardRepository;
 import com.example.swcompetitionproject.repository.ChattingRoomRepository;
 import com.example.swcompetitionproject.repository.InterestRepository;
@@ -89,6 +86,9 @@ public class BoardService {
                 break;
             default:
                 if (createBoardDto.getTotal() == 0) throw new UnauthorizedException(ErrorCode.NOT_BLANK);
+                else if(createBoardDto.getTotal() != 0 && createBoardDto.getTotal() != 2 && createBoardDto.getTotal() != 4) {
+                    throw new BadRequestException(ErrorCode.BAD_REQUEST_TOTAL);
+                }
                 break;
         }
 
