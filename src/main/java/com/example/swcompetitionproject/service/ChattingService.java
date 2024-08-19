@@ -99,7 +99,7 @@ public class ChattingService {
         }
         // 다른 성별일 경우
         if (room.getBoard().getUser().getGender() != user.getGender()) {
-            throw new UnauthorizedException(ErrorCode.FORBIDDEN_GENDER);
+            throw new UnauthorizedException(ErrorCode.FORBIDDEN_GENDER_ROOM);
         }
 
         room.setMemberCount(room.getMemberCount() + 1);
