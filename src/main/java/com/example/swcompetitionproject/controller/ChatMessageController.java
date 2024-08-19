@@ -48,32 +48,35 @@ public class ChatMessageController {
     }
 
     /**
-     * 다른 유저의 채팅방 입장하기
+     * 채팅방 입장하기
      **/
     @PostMapping("/chat")
     public ResponseEntity<ResponseDto<Void>> getRoomList(@AuthenticatedUser User user, @Valid @RequestBody RoomIdDto roomIdDto) {
-        boolean isNewUser = chattingService.isNewUserInRoom(user, roomIdDto.getRoomId());
+
         // 만약 새로운 유저라면, 채팅방 입장 메시지 전송
+        boolean isNewUser = chattingService.isNewUserInRoom(user, roomIdDto.getRoomId());
         if (isNewUser) {
             chattingService.addUserToRoom(user, roomIdDto.getRoomId());
             ChatMessageDto enterMessageDto = ChatMessageDto.builder()
                     .roomId(roomIdDto.getRoomId())
-                    .content(user.getName() + "님이 채팅방에 입장하였습니다.")
+                    .content(user.getName() + "님이 채팅방에 입장했습니다.")
                     .sender(user.getName())
                     .timestamp(LocalDateTime.now())
                     .build();
+
+            // 입장 메시지 저장 및 전송
             template.convertAndSend("/sub/ws/chat/room/" + roomIdDto.getRoomId(), enterMessageDto);
             chattingService.saveMessage(enterMessageDto);
         }
-        return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "다른 유저 채팅방 입장 완료"), HttpStatus.CREATED);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "채팅방에 입장하였습니다."), HttpStatus.CREATED);
     }
 
     /**
-     * 채팅방 입장하기
+     * 특정 채팅방 입장하기
      **/
     @MessageMapping("/ws/chat/{roomId}/enter")
     public void enter(@DestinationVariable UUID roomId) {
-        // 기존 메시지들 전송 (처음 입장하는 유저가 아닌 경우에만)
+        // 기존 메시지들 전송
         List<Message> previousMessages = chattingService.getMessagesByRoomId(roomId);
         for (Message message : previousMessages) {
             ChatMessageDto messageDto = ChatMessageDto.builder()
@@ -91,8 +94,8 @@ public class ChatMessageController {
      **/
     @MessageMapping("/ws/chat/send")
     public void message(@Payload ChatMessageDto message) {
-        message.setTimestamp(LocalDateTime.now());
         // MessageRepository 에 메시지 저장
+        message.setTimestamp(LocalDateTime.now());
         chattingService.saveMessage(message);
         // 메시지 전송
         template.convertAndSend("/sub/ws/chat/room/" + message.getRoomId(), message);
@@ -105,17 +108,17 @@ public class ChatMessageController {
     public void quit(@DestinationVariable UUID roomId, @Payload ChatMessageDto message) {
         // 사용자를 채팅방에서 제거
         chattingService.removeUserFromRoom(message);
-        log.info("퇴장 완료");
 
         // 퇴장 메시지 생성 및 타임스탬프 설정
         ChatMessageDto quitMessage = ChatMessageDto.builder()
                 .roomId(roomId)
-                .content(message.getSender() + "님이 퇴장하셨습니다.")
+                .content(message.getSender() + "님이 채팅방을 퇴장했습니다.")
                 .sender(message.getSender())
                 .timestamp(LocalDateTime.now()) // 현재 시간을 타임스탬프로 설정
                 .build();
+
+        // 톼장 메시지 저장 및 전송
         template.convertAndSend("/sub/ws/chat/room/" + message.getRoomId(), quitMessage);
         chattingService.saveMessage(quitMessage);
-        log.info("퇴장 메세지 전송 완료");
     }
 }

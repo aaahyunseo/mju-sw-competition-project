@@ -4,6 +4,7 @@ import com.example.swcompetitionproject.dto.request.chatting.ChatMessageDto;
 import com.example.swcompetitionproject.dto.response.chatting.ChattingRoomListData;
 import com.example.swcompetitionproject.entity.*;
 import com.example.swcompetitionproject.exception.ErrorCode;
+import com.example.swcompetitionproject.exception.ForbiddenException;
 import com.example.swcompetitionproject.exception.NotFoundException;
 import com.example.swcompetitionproject.exception.UnauthorizedException;
 import com.example.swcompetitionproject.repository.*;
@@ -119,10 +120,11 @@ public class ChattingService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
 
         User user = userRepository.findByName(chatMessageDto.getSender())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
         UserRoom userRoom = userRoomRepository.findByUserAndChattingRoom(user, room)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new ForbiddenException(ErrorCode.NO_ACCESS));
+
         userRoomRepository.delete(userRoom);
 
         room.setMemberCount(room.getMemberCount() - 1);
@@ -144,8 +146,6 @@ public class ChattingService {
     public List<Message> getMessagesByRoomId(UUID roomId) {
         ChattingRoom room = chattingRoomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
-        List<Message> messages = messageRepository.findByChattingRoomOrderByCreatedAtAsc(room);
-        log.info("기존 메세지 조회 service: {} messages from room {}", messages.size(), roomId);
         return messageRepository.findByChattingRoomOrderByCreatedAtAsc(room);
     }
 
@@ -156,7 +156,6 @@ public class ChattingService {
     public boolean isNewUserInRoom(User user, UUID roomId) {
         ChattingRoom chattingRoom = chattingRoomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
-
         return !userRoomRepository.existsByUserAndChattingRoom(user, chattingRoom);
     }
 }
