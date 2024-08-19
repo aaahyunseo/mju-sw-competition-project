@@ -9,4 +9,5 @@ import java.util.UUID;
 
 public interface ChattingRoomRepository extends JpaRepository<ChattingRoom, UUID> {
     Optional<ChattingRoom> deleteByBoard(Board board);
+    Optional<ChattingRoom> findByBoard(Board board);
 }
