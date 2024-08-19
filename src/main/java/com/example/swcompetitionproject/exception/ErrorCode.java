@@ -8,6 +8,7 @@ import lombok.Getter;
 public enum ErrorCode {
 
     //BadRequestException
+    BAD_REQUEST_TOTAL("4000","기숙사는 2인실 또는 4인실만 존재합니다."),
 
     //UnauthorizedException
     INVALID_TOKEN("4010", "유효하지 않은 토큰입니다."),
