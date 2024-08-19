@@ -7,6 +7,7 @@ import com.example.swcompetitionproject.dto.response.board.MyBoardListData;
 import com.example.swcompetitionproject.dto.response.category.CategoryListData;
 import com.example.swcompetitionproject.dto.response.user.UserResponseDto;
 import com.example.swcompetitionproject.entity.*;
+import com.example.swcompetitionproject.exception.ConflictException;
 import com.example.swcompetitionproject.exception.ErrorCode;
 import com.example.swcompetitionproject.exception.NotFoundException;
 import com.example.swcompetitionproject.exception.UnauthorizedException;
@@ -32,6 +33,11 @@ public class MyPageService {
      */
     public void userInfoSave(User user, UserInfoDto userInfoDto) {
         GenderType genderType = genderValidate(userInfoDto.getGender());
+
+        //이름 중복 방지
+        if (userRepository.findByName(userInfoDto.getName()).isPresent()) {
+            throw new ConflictException(ErrorCode.DUPLICATED_NAME);
+        }
         //유저의 이름과 성별 필수
         user.setName(userInfoDto.getName()).setGender(genderType);
         userRepository.save(user);
@@ -40,6 +46,10 @@ public class MyPageService {
      * 유저 정보 변경
      */
     public void modifyUserInfo(User user, ModifyUserInfoDto modifyUserInfoDto) {
+        //이름 중복 방지
+        if (userRepository.findByName(modifyUserInfoDto.getName()).isPresent()) {
+            throw new ConflictException(ErrorCode.DUPLICATED_NAME);
+        }
         //유저의 이름만 변경
         user.setName(modifyUserInfoDto.getName());
         userRepository.save(user);
