@@ -81,7 +81,7 @@ public class ChattingService {
     }
 
     /**
-     * 채팅방에 사용자 추가하기
+     * 채팅방에 유저 추가하기
      **/
     @Transactional
     public void addUserToRoom(User user, UUID roomId) {
@@ -102,15 +102,27 @@ public class ChattingService {
             throw new UnauthorizedException(ErrorCode.FORBIDDEN_GENDER);
         }
 
+        room.setMemberCount(room.getMemberCount() + 1);
+        chattingRoomRepository.save(room);
+    }
+
+    /**
+     * 채팅방 들어가기
+     **/
+    @Transactional
+    public void enterRoom(String name, UUID roomId) {
+        ChattingRoom room = chattingRoomRepository.findById(roomId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
+        User user = userRepository.findByName(name)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
         UserRoom userRoom = UserRoom.builder()
                 .user(user)
                 .chattingRoom(room)
                 .build();
         userRoomRepository.save(userRoom);
-
-        room.setMemberCount(room.getMemberCount() + 1);
-        chattingRoomRepository.save(room);
     }
+
 
     /**
      * 채팅방 퇴장하기
@@ -160,9 +172,11 @@ public class ChattingService {
      * 채팅방에 처음 입장한 유저인지 확인
      **/
     @Transactional
-    public boolean isNewUserInRoom(User user, UUID roomId) {
+    public boolean isNewUserInRoom(String name, UUID roomId) {
         ChattingRoom chattingRoom = chattingRoomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
+        User user = userRepository.findByName(name)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
         return !userRoomRepository.existsByUserAndChattingRoom(user, chattingRoom);
     }
 }
