@@ -48,25 +48,13 @@ public class ChatMessageController {
     }
 
     /**
-     * 채팅방 입장하기
+     * 채팅방 추가하기
      **/
     @PostMapping("/chat")
     public ResponseEntity<ResponseDto<Void>> getRoomList(@AuthenticatedUser User user, @Valid @RequestBody RoomIdDto roomIdDto) {
-
-        // 만약 새로운 유저라면, 채팅방 입장 메시지 전송
-        boolean isNewUser = chattingService.isNewUserInRoom(user, roomIdDto.getRoomId());
+        boolean isNewUser = chattingService.isNewUserInRoom(user.getName(), roomIdDto.getRoomId());
         if (isNewUser) {
             chattingService.addUserToRoom(user, roomIdDto.getRoomId());
-            ChatMessageDto enterMessageDto = ChatMessageDto.builder()
-                    .roomId(roomIdDto.getRoomId())
-                    .content(user.getName() + "님이 채팅방에 입장했습니다.")
-                    .sender(user.getName())
-                    .timestamp(LocalDateTime.now())
-                    .build();
-
-            // 입장 메시지 저장 및 전송
-            template.convertAndSend("/sub/ws/chat/room/" + roomIdDto.getRoomId(), enterMessageDto);
-            chattingService.saveMessage(enterMessageDto);
         }
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "채팅방에 입장하였습니다."), HttpStatus.CREATED);
     }
@@ -75,17 +63,33 @@ public class ChatMessageController {
      * 특정 채팅방 입장하기
      **/
     @MessageMapping("/ws/chat/{roomId}/enter")
-    public void enter(@DestinationVariable UUID roomId) {
-        // 기존 메시지들 전송
-        List<Message> previousMessages = chattingService.getMessagesByRoomId(roomId);
-        for (Message message : previousMessages) {
-            ChatMessageDto messageDto = ChatMessageDto.builder()
-                    .roomId(roomId)
-                    .content(message.getContent())
-                    .sender(message.getSender())
-                    .timestamp(message.getCreatedAt())
+    public void enter(@DestinationVariable UUID roomId, @Payload ChatMessageDto chatMessageDto) {
+        boolean isNewUser = chattingService.isNewUserInRoom(chatMessageDto.getSender(), chatMessageDto.getRoomId());
+
+        if(!isNewUser){
+            List<Message> previousMessages = chattingService.getMessagesByRoomId(roomId);
+            for (Message message : previousMessages) {
+                ChatMessageDto messageDto = ChatMessageDto.builder()
+                        .roomId(roomId)
+                        .content(message.getContent())
+                        .sender(message.getSender())
+                        .timestamp(message.getCreatedAt())
+                        .build();
+                template.convertAndSend("/sub/ws/chat/room/" + roomId, messageDto);
+            }
+        }
+
+        if (isNewUser) {
+            chattingService.enterRoom(chatMessageDto.getSender(), chatMessageDto.getRoomId());
+            ChatMessageDto enterMessageDto = ChatMessageDto.builder()
+                    .roomId(chatMessageDto.getRoomId())
+                    .content(chatMessageDto.getSender() + "님이 채팅방에 입장했습니다.")
+                    .sender(chatMessageDto.getSender())
+                    .timestamp(LocalDateTime.now())
                     .build();
-            template.convertAndSend("/sub/ws/chat/room/" + roomId, messageDto);
+            // 입장 메시지 저장 및 전송
+            template.convertAndSend("/sub/ws/chat/room/" + chatMessageDto.getRoomId(), enterMessageDto);
+            chattingService.saveMessage(enterMessageDto);
         }
     }
 
