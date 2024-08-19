@@ -102,11 +102,11 @@ public class ChatMessageController {
      * 채팅방 퇴장하기
      **/
     @MessageMapping("/ws/chat/{roomId}/quit")
-    public void quit(@DestinationVariable UUID roomId, @AuthenticatedUser User user, @Payload ChatMessageDto message) {
+    public void quit(@DestinationVariable UUID roomId, @Payload ChatMessageDto message) {
         // 사용자를 채팅방에서 제거
-        chattingService.removeUserFromRoom(user, roomId);
-
+        chattingService.removeUserFromRoom(message);
         log.info("퇴장 완료");
+
         // 퇴장 메시지 생성 및 타임스탬프 설정
         ChatMessageDto quitMessage = ChatMessageDto.builder()
                 .roomId(roomId)
@@ -115,6 +115,7 @@ public class ChatMessageController {
                 .timestamp(LocalDateTime.now()) // 현재 시간을 타임스탬프로 설정
                 .build();
         template.convertAndSend("/sub/ws/chat/room/" + message.getRoomId(), quitMessage);
+        chattingService.saveMessage(quitMessage);
         log.info("퇴장 메세지 전송 완료");
     }
 }
