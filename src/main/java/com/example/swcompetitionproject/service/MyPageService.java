@@ -47,6 +47,7 @@ public class MyPageService {
         user.setName(userInfoDto.getName()).setGender(genderType);
         userRepository.save(user);
     }
+
     /**
      * 유저 정보 변경
      */
@@ -65,6 +66,7 @@ public class MyPageService {
      */
     public UserResponseDto getUserInfo(User user) {
         UserResponseDto userResponseDto = UserResponseDto.builder()
+                .id(user.getId())
                 .name(user.getName())
                 .major(user.getMajor())
                 .studentNumber(user.getStudentNumber())
@@ -146,14 +148,14 @@ public class MyPageService {
     /**
      * 유저 프로필 조회
      */
-    public UserProfileResponseDto getUserProfile(UserProfileDto userProfileDto){
-        User profileUser=userRepository.findByName(userProfileDto.getName())
+    public UserProfileResponseDto getUserProfile(UserProfileDto userProfileDto) {
+        User profileUser = userRepository.findByName(userProfileDto.getName())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
         List<Category> categoriesLsit = categoryRepository.findAllByUserOrderByCreatedAtAsc(profileUser);
-        CategoryListData categories= CategoryListData.from(categoriesLsit);
+        CategoryListData categories = CategoryListData.from(categoriesLsit);
 
-        UserProfileResponseDto userProfileResponseDto= UserProfileResponseDto.builder()
+        UserProfileResponseDto userProfileResponseDto = UserProfileResponseDto.builder()
                 .categoryListData(categories)
                 .name(profileUser.getName())
                 .build();
