@@ -74,6 +74,7 @@ public class ChattingService {
         Message newMessage = Message.builder()
                 .content(message.getContent())
                 .sender(message.getSender())
+                .userId(message.getUserId())
                 .chattingRoom(room)
                 .build();
 
@@ -110,10 +111,10 @@ public class ChattingService {
      * 채팅방 들어가기
      **/
     @Transactional
-    public void enterRoom(String name, UUID roomId) {
+    public void enterRoom(UUID userId, UUID roomId) {
         ChattingRoom room = chattingRoomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
-        User user = userRepository.findByName(name)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
         UserRoom userRoom = UserRoom.builder()
@@ -132,7 +133,7 @@ public class ChattingService {
         ChattingRoom room = chattingRoomRepository.findById(chatMessageDto.getRoomId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
 
-        User user = userRepository.findByName(chatMessageDto.getSender())
+        User user = userRepository.findById(chatMessageDto.getUserId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
         UserRoom userRoom = userRoomRepository.findByUserAndChattingRoom(user, room)
@@ -143,7 +144,7 @@ public class ChattingService {
         room.setMemberCount(room.getMemberCount() - 1);
         chattingRoomRepository.save(room);
 
-        if(room.getMemberCount()==0){
+        if (room.getMemberCount() == 0) {
             Board board = boardRepository.findBoardByChattingRoom(room)
                     .orElseThrow(() -> new ForbiddenException(ErrorCode.BOARD_NOT_FOUND));
             boardRepository.delete(board);
@@ -172,10 +173,10 @@ public class ChattingService {
      * 채팅방에 처음 입장한 유저인지 확인
      **/
     @Transactional
-    public boolean isNewUserInRoom(String name, UUID roomId) {
+    public boolean isNewUserInRoom(UUID userId, UUID roomId) {
         ChattingRoom chattingRoom = chattingRoomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
-        User user = userRepository.findByName(name)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
         return !userRoomRepository.existsByUserAndChattingRoom(user, chattingRoom);
     }
