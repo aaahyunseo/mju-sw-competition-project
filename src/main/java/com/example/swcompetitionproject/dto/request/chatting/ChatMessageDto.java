@@ -13,8 +13,10 @@ import java.util.UUID;
 public class ChatMessageDto {
     @NotBlank(message = "roomId를 입력해주세요.")
     private UUID roomId;
-    private String content;
     @NotBlank(message = "메세지 발신자를 입력해주세요.")
     private String sender;
+    @NotBlank(message = "userId를 입력해주세요.")
+    private UUID userId;
+    private String content;
     private LocalDateTime timestamp;
 }

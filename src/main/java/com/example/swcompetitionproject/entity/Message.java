@@ -3,6 +3,8 @@ package com.example.swcompetitionproject.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,6 +20,10 @@ public class Message extends BaseEntity {
     //발신자
     @Column(nullable = false)
     private String sender;
+
+    //발신자 UUID
+    @Column(nullable = false)
+    private UUID userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chattingRoom_id")
