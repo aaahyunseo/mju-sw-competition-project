@@ -7,6 +7,9 @@ import com.example.swcompetitionproject.dto.response.ResponseDto;
 import com.example.swcompetitionproject.dto.response.chatting.ChattingRoomListData;
 import com.example.swcompetitionproject.entity.Message;
 import com.example.swcompetitionproject.entity.User;
+import com.example.swcompetitionproject.exception.ErrorCode;
+import com.example.swcompetitionproject.exception.NotFoundException;
+import com.example.swcompetitionproject.repository.UserRepository;
 import com.example.swcompetitionproject.service.ChattingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +40,7 @@ import java.util.UUID;
 public class ChatMessageController {
     private final SimpMessagingTemplate template;
     private final ChattingService chattingService;
+    private final UserRepository userRepository;
 
     /**
      * 채팅방 목록 조회
@@ -52,7 +56,7 @@ public class ChatMessageController {
      **/
     @PostMapping("/chat")
     public ResponseEntity<ResponseDto<Void>> getRoomList(@AuthenticatedUser User user, @Valid @RequestBody RoomIdDto roomIdDto) {
-        boolean isNewUser = chattingService.isNewUserInRoom(user.getName(), roomIdDto.getRoomId());
+        boolean isNewUser = chattingService.isNewUserInRoom(user.getId(), roomIdDto.getRoomId());
         if (isNewUser) {
             chattingService.addUserToRoom(user, roomIdDto.getRoomId());
         }
@@ -64,27 +68,33 @@ public class ChatMessageController {
      **/
     @MessageMapping("/ws/chat/{roomId}/enter")
     public void enter(@DestinationVariable UUID roomId, @Payload ChatMessageDto chatMessageDto) {
-        boolean isNewUser = chattingService.isNewUserInRoom(chatMessageDto.getSender(), chatMessageDto.getRoomId());
+        boolean isNewUser = chattingService.isNewUserInRoom(chatMessageDto.getUserId(), chatMessageDto.getRoomId());
 
-        if(!isNewUser){
+        // 기존 채팅방 유저일 때 기존 메시지 띄우기
+        if (!isNewUser) {
             List<Message> previousMessages = chattingService.getMessagesByRoomId(roomId);
             for (Message message : previousMessages) {
+                User user = userRepository.findById(message.getUserId())
+                        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
                 ChatMessageDto messageDto = ChatMessageDto.builder()
                         .roomId(roomId)
                         .content(message.getContent())
-                        .sender(message.getSender())
+                        .sender(user.getName())
+                        .userId(user.getId())
                         .timestamp(message.getCreatedAt())
                         .build();
                 template.convertAndSend("/sub/ws/chat/room/" + roomId, messageDto);
             }
         }
 
+        // 새로 들어온 유저일 경우 입장 메시지 전송
         if (isNewUser) {
-            chattingService.enterRoom(chatMessageDto.getSender(), chatMessageDto.getRoomId());
+            chattingService.enterRoom(chatMessageDto.getUserId(), chatMessageDto.getRoomId());
             ChatMessageDto enterMessageDto = ChatMessageDto.builder()
                     .roomId(chatMessageDto.getRoomId())
                     .content(chatMessageDto.getSender() + "님이 채팅방에 입장했습니다")
                     .sender(chatMessageDto.getSender())
+                    .userId(chatMessageDto.getUserId())
                     .timestamp(LocalDateTime.now())
                     .build();
             // 입장 메시지 저장 및 전송
@@ -118,7 +128,8 @@ public class ChatMessageController {
                 .roomId(roomId)
                 .content(message.getSender() + "님이 채팅방을 퇴장했습니다")
                 .sender(message.getSender())
-                .timestamp(LocalDateTime.now()) // 현재 시간을 타임스탬프로 설정
+                .userId(message.getUserId())
+                .timestamp(LocalDateTime.now())
                 .build();
 
         // 톼장 메시지 저장 및 전송
