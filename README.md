@@ -11,7 +11,7 @@
 
 ## 역할
 
-- **프론트엔드 개발**: React.js를 활용하여 웹 페이지의 사용자 인터페이스를 개발하였습니다.
+- **서버 개발**: 크롤링을 이용하여 학교 계정으로 로그인을 할수 있게 하고, 웹소켓을 이용하여 실시간 채팅을 구현 했습니다.
 - **UI/UX 디자인**: 사용자가 쉽게 룸메이트를 찾고 소통할 수 있도록 직관적인 인터페이스를 설계하였습니다.
 
 <br/>
@@ -81,8 +81,12 @@
 
 ### Development
 
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=Javascript&logoColor=white)
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![MySQL](https://img.shields.io/badge/mysql-4479A1.svg?style=for-the-badge&logo=mysql&logoColor=white)
+![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+![Socket.io](https://img.shields.io/badge/Socket.io-black?style=for-the-badge&logo=socket.io&badgeColor=010101)
 
 ### Communication
 
