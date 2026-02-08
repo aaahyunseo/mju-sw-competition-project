@@ -27,6 +27,9 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String studentNumber;
 
+    //비밀번호
+    private String password;
+
     //성별
     @Enumerated(EnumType.STRING)
     private GenderType gender;
