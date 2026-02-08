@@ -12,6 +12,7 @@ public enum ErrorCode {
 
     //UnauthorizedException
     INVALID_TOKEN("4010", "유효하지 않은 토큰입니다."),
+    INVALID_EMAIL_OR_PASSWORD("4011", "아이디 또는 비밀번호를 잘못 입력했습니다."),
     INVALID_DORMITORY("4012", "유효하지 않은 기숙사입니다."),
     INVALID_GENDER("4013", "유효하지 않은 성별입니다."),
     ROOM_FULL("4014", "채팅방에 참여 가능한 인원이 가득찼습니다."),
@@ -33,6 +34,7 @@ public enum ErrorCode {
 
     //ConflictException
     DUPLICATED_NAME("4090", "이미 사용중인 이름입니다."),
+    DUPLICATED_STD_NUM("4091", "이미 등록된 학번입니다."),
 
     //ValidationException
     NOT_NULL("9001", "필수값이 누락되었습니다."),

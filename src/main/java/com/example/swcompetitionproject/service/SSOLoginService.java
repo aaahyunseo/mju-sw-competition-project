@@ -20,7 +20,7 @@ import java.util.Map;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class LoginService {
+public class SSOLoginService {
 
     private final RestTemplate restTemplate;
 
@@ -42,8 +42,8 @@ public class LoginService {
 
         //유저 정보 입력 데이터
         MultiValueMap<String, String> userData = new LinkedMultiValueMap<>();
-        userData.add("id", loginDto.getId());
-        userData.add("passwrd", loginDto.getPasswrd());
+        userData.add("id", loginDto.getStudentNumber());
+        userData.add("passwrd", loginDto.getPassword());
 
         // HttpEntity 생성
         HttpEntity<MultiValueMap<String, String>> userDatarequestEntity = new HttpEntity<>(userData, headers);
@@ -62,8 +62,8 @@ public class LoginService {
 
         //로그인 데이터 생성
         MultiValueMap<String, String> loginData = new LinkedMultiValueMap<>();
-        loginData.add("id", loginDto.getId());
-        loginData.add("passwrd", loginDto.getPasswrd());
+        loginData.add("id", loginDto.getStudentNumber());
+        loginData.add("passwrd", loginDto.getPassword());
         loginData.add("redirect_uri", "http://lms.mju.ac.kr/ilos/bandi/sso/index.jsp");
 
         // HttpEntity 생성
@@ -83,14 +83,14 @@ public class LoginService {
 
         User user;
         //유저가 디비에 등록되어있는지 확인
-        if (userRepository.findByStudentNumber(loginDto.getId()).isPresent()) {
+        if (userRepository.findByStudentNumber(loginDto.getStudentNumber()).isPresent()) {
             //등록되어져 있다면 유저 객체 찾기
-            user = userRepository.findByStudentNumber(loginDto.getId())
+            user = userRepository.findByStudentNumber(loginDto.getStudentNumber())
                     .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
         } else {
             //등록되어있지 않는다면 유저 등록(회원가입과 동일)
             user = User.builder()
-                    .studentNumber(loginDto.getId())
+                    .studentNumber(loginDto.getStudentNumber())
                     .build();
             userRepository.save(user);
         }
